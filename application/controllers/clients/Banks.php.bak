@@ -1,0 +1,2194 @@
+<?php
+
+if (!defined('BASEPATH'))
+    exit('No direct script access allowed');
+
+//session_start();
+class Banks extends CI_Controller {
+
+    public function Banks() {
+        parent::__construct();
+
+        /**
+         * 	First check if accountant is accessing the Clients account or not.
+         * 	Preventing accountant from direct access to the client's dashboard.
+         */
+        checkUserAccess(array('TYPE_ACC', 'TYPE_CLI'));
+
+        /* Load the expense model */
+        $this->load->model('clients/bank');
+    }
+
+    public function index() {
+        $_SESSION['bank_statements'] = '';
+        $_SESSION['bankId'] = '';
+        $this->session->set_userdata('temp_statement_record', '');
+        $page = ($this->uri->segment(2)) ? $this->uri->segment(2) : 0;
+        $data['title'] = "Dashboard | Bank Statements";
+        $data['page'] = "banks";
+        $user = $this->session->userdata('user');
+        $data['getbanks'] = $this->bank->getBanks($user['CompanyID']);
+        $bankId = $data['getbanks'][0]->BID;
+        $data['items'] = $this->bank->getItems(BANK_PAGINATION_LIMIT, $page, '', $bankId);
+        $data['current_balance'] = $this->bank->get_current_balance();
+        $data['current_balance'] = $data['current_balance']['Balance'];
+        $total = $this->bank->totalEntries();
+        $data['pagination'] = $this->getPagination(BANK_PAGINATION_LIMIT, $total);
+        $this->load->view('client/banks/default', $data);
+    }
+
+    private function getPagination($perPage = BANK_PAGINATION_LIMIT, $totalItem = 0) {
+        /* Create Pagination links */
+        $this->load->library('pagination');
+        $config['base_url'] = site_url() . 'bank_statements';
+        $config['num_links'] = 2;
+        $config['per_page'] = $perPage;
+        $config['total_rows'] = $totalItem;
+        $config['uri_segment'] = 2;
+        $config['full_tag_open'] = '<ul class="pagination pull-right">';
+        $config['full_tag_close'] = '</ul>';
+        $config['prev_link'] = '<span aria-hidden="true">Prev</span><span class="sr-only">Prev</span>';
+        $config['prev_tag_open'] = '<li>';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_link'] = '<span aria-hidden="true">Next</span><span class="sr-only">Next</span>';
+        $config['next_tag_open'] = '<li>';
+        $config['next_tag_close'] = '</li>';
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+        $config['last_link'] = FALSE;
+        $config['first_link'] = FALSE;
+        $config['cur_tag_open'] = '<li><a ><b>';
+        $config['cur_tag_close'] = '</b></a></li>';
+        $this->pagination->initialize($config);
+        return $this->pagination->create_links();
+    }
+
+    public function form() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $json = array();
+            $task = $this->encrypt->decode($_POST['task']);
+
+            if (($task == 'createInvoice' || $task == 'createDividend') && $_POST['Others'] != 'bank_ajax_add') {
+                $statements = $_SESSION['bank_statements'];
+                $statements = json_decode($statements);
+                $categories = array(
+                    '0' => 75,
+                    '1' => 78
+                );
+                $statement_date = $_POST['Date'];
+                $statement_type = $_POST['Type'];
+                $statement_desc = $_POST['Description'];
+                $statement_mo = $_POST['MoneyOut'];
+                $statement_mi = $_POST['MoneyIn'];
+                $statement_bal = $_POST['Balance'];
+                $statement_cat = $_POST['Category'];
+                //pr($_POST);
+                foreach ($statements as $key => $val) {
+                    $statements[$key]->TransactionDate = mDate($statement_date[$key]);
+                    $statements[$key]->Type = $statement_type[$key];
+                    $statements[$key]->Description = $statement_desc[$key];
+                    $statements[$key]->MoneyOut = $statement_mo[$key];
+                    $statements[$key]->MoneyIn = $statement_mi[$key];
+                    $statements[$key]->Balance = $statement_bal[$key];
+                    $statements[$key]->Category = $statement_cat[$key];
+                    if (!in_array($val->Category, $categories)) {
+                        $statements[$key]->StatementType = '';
+                    } else {
+                        if ($val->Category == 75) {
+                            $statements[$key]->StatementType = 'I';
+                        } elseif ($val->Category == 78) {
+                            $statements[$key]->StatementType = 'D';
+                        }
+                    }
+                }
+                //pr($statements);die;
+                $statements = json_encode($statements);
+                $_SESSION['bank_statements'] = $statements;
+            }
+
+            if ($task == 'createInvoice') {
+                //echo '<pre>';print_r($_POST);echo '</pre>';die;
+                $this->load->model('clients');				
+                $id = $_POST['ID'];
+                $id = $this->encrypt->decode($id);
+				$clickedrow = $_POST['clickedrow'];
+				
+				if( isset($_POST['Description'][$clickedrow]) && $_POST['Description'][$clickedrow] != '')
+				{
+					$existingInvoicesDesc = $this->bank->getExistingInvoicesDesc();
+					if (empty($existingInvoicesDesc))
+						$data['item']['UserID'] = 0;
+					else 
+					{
+						$totalRecs = count($existingInvoicesDesc);
+						$break     = 'no';
+						for ($i = 0; $i < $totalRecs; $i++) 
+						{
+							if($break == 'yes')
+								break;
+							$releatedPercentage = array();
+							for ($j = 0; $j < $totalRecs; $j++) 
+							{
+								if($break == 'yes')
+									break;
+								$var_1 = '';
+								$var_2 = '';
+								
+								$var_2 = str_replace(' ', '', $existingInvoicesDesc[$j]['Description']);
+								$var_1 = str_replace(' ', '', $_POST['Description'][$clickedrow]);
+								similar_text($var_1, $var_2, $percent);
+								$releatedPercentage[$j] = number_format($percent, 2);								
+							}
+							if (!empty($releatedPercentage)) 
+							{
+								$val = max($releatedPercentage);
+								$key = array_search($val, $releatedPercentage);
+								if ($val > 70) {
+									if ($key >= 0) {
+										$data['item']['UserID'] = $existingInvoicesDesc[$key]['UserID'];
+									}
+									$break = 'yes';
+								}
+								else if ($val > 60) {
+									if ($key >= 0) {
+										$data['item']['UserID'] = $existingInvoicesDesc[$key]['UserID'];
+									}
+								}
+								else if ($val > 50) {
+									if ($key >= 0) {
+										$data['item']['UserID'] = $existingInvoicesDesc[$key]['UserID'];
+									}
+								}
+							}
+						}	
+					}
+				}
+				else
+					$data['item']['UserID'] = 0;
+				
+                if (isset($_POST['Amount']) && !empty($_POST['Amount'])) {
+                    $amount = $_POST['Amount'];
+                    $due_date = cDate($_POST['PDate']);
+                } else {
+                    $response = $this->bank->getStatements($id);
+                    $amount = (!empty($response['MoneyOut'])) ? $response['MoneyOut'] : $response['MoneyIn'];
+                    $due_date = cDate($response['TransactionDate']);
+                }
+                //echo '<pre>';print_r($_POST);echo '</pre>';die;
+                $quantity_amount = ($amount * 100) / 120;
+
+                $amount = '';
+                $data['invoice_type'] = '';
+                
+                $data['item']['Name'] = '';
+                $data['item']['Address'] = '';
+                $data['item']['InvoiceID'] = '';
+                $data['item']['DueDate'] = $due_date;
+                $data['item']['BankDetail'] = 0;
+                //$data['item']['InvoiceDate']	=	date('d-m-Y');
+                $data['item']['InvoiceDate'] = $due_date;
+                $data['item']['InvoiceItems'] = array('0' => (object) array(
+                        'ItemID' => '',
+                        'Description' => '',
+                        'UnitPrice' => $quantity_amount,
+                        'Quantity' => 1,
+                        'Tax' => 20,
+                ));
+                $vat_listing = checkvatifExist();
+                $data['vat_listing'] = $vat_listing;
+                $json['file'] = '';
+                $data['bank_statement_id'] = $_POST['ID'];
+                $data['bank_paid_date'] = $due_date;
+                $data['ajax_add'] = $_POST['Others'];
+                $data['users'] = $this->clients->getcustomerList();
+                $json['script'] = $this->load->view('client/invoices/invoice_js', '', true);
+                $json['script'] = str_replace(array('<script>', '</script>'), '', $json['script']);
+                $json['html'] = $this->load->view('client/invoices/form', $data, true);
+                die(json_encode($json));
+            } elseif ($task == 'createDividend') {
+                /* Get balance amount */
+                $id = $_POST['ID'];
+
+                $id = $this->encrypt->decode($id);
+                //pr($_POST);
+                if (isset($_POST['Amount']) && !empty($_POST['Amount'])) {
+                    $amount = $_POST['Amount'];
+                    $pdate = mDate($_POST['PDate']);
+                } else {
+                    $response = $this->bank->getStatements($id);
+                    $amount = (!empty($response['MoneyOut'])) ? $response['MoneyOut'] : $response['MoneyIn'];
+                    $pdate = $response['TransactionDate'];
+                }
+
+                /* Get previous Dividends list */
+
+                $amount = trim(str_replace('-', '', $amount));
+                $this->load->model('clients/dividends');
+                $data['net_amount'] = $amount;
+                $data['t_date'] = $pdate;
+                $data['bank_statement_id'] = $_POST['ID'];
+                $data['bank_paid_date'] = $_POST['PDate'];
+                $data['share_holders'] = $this->dividends->getShareHoldersList();
+                $data['shares'] = $this->dividends->getTotalShares();
+                $task = safe($this->encrypt->decode($_POST['task']));
+                $data['task'] = $task;
+                $data['ajax_add'] = $_POST['Others'];
+                $data['Directors'] = $this->dividends->getDirectorsList();
+                $json['script'] = $this->load->view('client/dividend/dividend_js', '', true);
+                $json['script'] = str_replace(array('<script>', '</script>'), '', $json['script']);
+                $json['html'] = $this->load->view('client/dividend/form', $data, true);
+                $json['file'] = '';
+                die(json_encode($json));
+            } else if ($task == 'addBankStatement') {
+                //echo '<pre>';print_r($_POST);echo '</pre>';die;
+                $this->load->model('clients');
+                $id = $_POST['ID'];
+                $id = $this->encrypt->decode($id);
+                $categories = $this->bank->getStatementCategories();
+                sort($categories);
+
+                $data['categories'] = $categories;
+                $types = array('1' => 'BAC', '2' => 'DPC', '3' => 'D/D', '4' => 'S/O');
+                $data['types'] = $types;
+                $json['file'] = '';
+                $data['bank_statement_id'] = $_POST['ID'];
+                $data['bank_paid_date'] = $due_date;
+                $data['ajax_add'] = $_POST['Others'];
+                $data['users'] = $this->clients->getcustomerList();
+                $json['script'] = $this->load->view('client/banks/banks_js', '', true);
+
+                $json['script'] = str_replace(array('<script>', '</script>'), '', $json['script']);
+
+
+                $json['html'] = $this->load->view('client/banks/addBankStatement', $data, true);
+                //echo "<pre>";print_r($json['html']);die('in add statement');
+                die(json_encode($json));
+            } else {
+                $data['statements'] = array();
+				$user = $this->session->userdata('user');
+				$data['getbanks'] = $this->bank->getBanks($user['CompanyID']);
+                $json['html'] = $this->load->view('client/banks/upload_form', $data, true);
+                $json['script'] = '';
+                $json['file'] = '<script type="text/javascript" src="' . site_url() . 'assets/js/filestyle.js"></script>';
+                die(json_encode($json));
+            }
+        } else {
+            show_404();
+        }
+    }
+
+    /*     * ****** filter excel columns ******** */
+
+    public function excelFileFilter() {
+        $columns = array();
+        $columns['columns'] = array();
+        if (isset($_POST)) {
+            //echo "<pre>";print_r($_FILES);
+            require_once(APPPATH . 'third_party/PHPExcel.php');
+            $file_extensions = array(
+                '0' => '.csv',
+                '1' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                '2' => 'application/vnd.ms-excel',
+                '3' => 'text/comma-separated-values',
+                '4' => 'text/csv',
+                '5' => 'application/csv',
+            );
+
+            if (!in_array($_FILES['file']['type'], $file_extensions)) {
+                $msg = '<div class="alert alert-danger">';
+                $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('BANK_UPLOAD_FILE_ERROR');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response['success'] = false;
+                $response['error_msg'] = $msg;
+                $response['url'] = site_url('bank_statements');
+                echo json_encode($response);
+                die;
+            }
+
+            $template_one = array(
+                '0' => 'Date',
+                '1' => 'Type',
+                '2' => 'Description',
+                '3' => 'Value',
+                '4' => 'Category',
+                '5' => 'Balance'
+            );
+
+            $template_two = array(
+                '0' => 'Date',
+                '1' => 'Type',
+                '2' => 'Description',
+                '3' => 'Money Out',
+                '4' => 'Money In',
+                '5' => 'Category',
+                '6' => 'Balance'
+            );
+
+            $count_one = count($template_one);
+            $count_two = count($template_two);
+
+            $path = $_FILES['file']['tmp_name'];
+            $inputFileType = PHPExcel_IOFactory::identify($path);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objReader->setReadDataOnly(TRUE);
+
+            /**  Load $inputFileName to a PHPExcel Object  * */
+            $objPHPExcel = $objReader->load($path);
+            $total_sheets = $objPHPExcel->getSheetCount();
+            $allSheetName = $objPHPExcel->getSheetNames('template');
+
+            $objWorksheet = $objPHPExcel->getActiveSheet();
+            //$objWorksheet 		= 	$objPHPExcel->setActiveSheetIndex(1); 
+            $highestRow = $objWorksheet->getHighestRow();
+            $highestColumn = $objWorksheet->getHighestColumn();
+            $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+            $flag = 0;
+
+            $statement_data = array();
+            for ($col = 0; $col < $highestColumnIndex; ++$col) {
+                $value = $objWorksheet->getCellByColumnAndRow($col, 1)->getCalculatedValue();
+                $arraydata['0'][$col] = $value;
+            }
+            $temp = $arraydata[0];
+            /* Remove empty row from the statement */
+            $arrStr = '';
+            $arrStr = implode($temp);
+            if (count($temp) > 0 && strlen($arrStr) != 0) {
+                $statement_data[] = $temp;
+            }
+
+            $arraydata = array_filter($statement_data);
+            $columns['columns'] = $arraydata;
+            $response['success'] = true;
+            $response['success_msg'] = 'success';
+            $response['url'] = '';
+            //echo json_encode($response);die;
+        } else {
+            $response['success'] = false;
+            $response['error_msg'] = 'Something happens wrong. Please try again.';
+        }
+        $response['html'] = $this->load->view('client/banks/excel_filter_form', $columns, true);
+        echo json_encode($response);
+        die;
+    }
+
+    public function saveExcelColumnMatch() {
+        $columns = array();
+        $columns['columns'] = array();
+        if (isset($_POST)) {
+            if ($_POST['col1'] == 1) {
+                $col1 = '';
+            } else
+                $col1 = $_POST['col1'];
+            if ($_POST['col2'] == 1) {
+                $col2 = '';
+            } else
+                $col2 = $_POST['col2'];
+            if ($_POST['col3'] == 1) {
+                $col3 = '';
+            } else
+                $col3 = $_POST['col3'];
+            if ($_POST['col4'] == 1) {
+                $col4 = '';
+            } else
+                $col4 = $_POST['col4'];
+            if ($_POST['col5'] == 1) {
+                $col5 = '';
+            } else
+                $col5 = $_POST['col5'];
+            if ($_POST['col6'] == 1) {
+                $col6 = '';
+            } else
+                $col6 = $_POST['col6'];
+
+            if (isset($_POST['col7'])) {
+                if ($_POST['col7'] == 1)
+                    $col7 = '';
+                else
+                    $col7 = $_POST['col7'];
+            } else
+                $col7 = '';
+
+            if ($col7 == '') {
+                $template = array(
+                    '0' => $col1,
+                    '1' => $col2,
+                    '2' => $col3,
+                    '3' => $col4,
+                    '4' => $col5,
+                    '5' => $col6
+                );
+            } else {
+                $template = array(
+                    '0' => $col1,
+                    '1' => $col2,
+                    '2' => $col3,
+                    '3' => $col4,
+                    '4' => $col5,
+                    '5' => $col6,
+                    '6' => $col7
+                );
+            }
+
+            $this->session->set_userdata('matchColumnTemplate', $template);
+
+            $response['success'] = true;
+            $response['success_msg'] = '';
+            $response['url'] = '';
+            //echo json_encode($response);die;
+        } else {
+            $response['success'] = false;
+            $response['error_msg'] = 'Something happens wrong. Please try again.';
+        }
+
+        echo json_encode($response);
+        die;
+    }
+
+    public function upload() {
+        $user = $this->session->userdata('user');
+        $matchColsTemplate = $this->session->userdata('matchColumnTemplate');
+
+        $data['title'] = 'Bank Statements';
+        $data['page'] = 'bank_statements';
+        $access = clientAccess();
+        $this->session->set_userdata('temp_statement_record', '');
+        $statement_type = array(
+            'I' => 'Sales',
+            'D' => 'Dividend'
+        );
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $bank_categories = $this->bank->getStatementCategories('statements');
+            require_once(APPPATH . 'third_party/PHPExcel.php');
+            $file_extensions = array(
+                '0' => '.csv',
+                '1' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                '2' => 'application/vnd.ms-excel',
+                '3' => 'text/comma-separated-values',
+                '4' => 'text/csv',
+                '5' => 'application/csv',
+            );
+            if (!in_array($_FILES['file']['type'], $file_extensions)) {
+                $msg = '<div class="alert alert-danger">';
+                $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('BANK_UPLOAD_FILE_ERROR');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response1['success'] = false;
+                $response1['error_msg'] = $msg;
+                $response1['url'] = site_url('bank_statements');
+                echo json_encode($response1);
+                die;
+            }
+
+            $template_one = array(
+                '0' => 'Date',
+                '1' => 'Type',
+                '2' => 'Description',
+                '3' => 'Value',
+                '4' => 'Category',
+                '5' => 'Balance'
+            );
+
+            $template_two = array(
+                '0' => 'Date',
+                '1' => 'Type',
+                '2' => 'Description',
+                '3' => 'Money Out',
+                '4' => 'Money In',
+                '5' => 'Category',
+                '6' => 'Balance'
+            );
+
+            $count_one = count($template_one);
+            $count_two = count($template_two);
+
+            $path = $_FILES['file']['tmp_name'];
+            $inputFileType = PHPExcel_IOFactory::identify($path);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objReader->setReadDataOnly(TRUE);
+
+            /**  Load $inputFileName to a PHPExcel Object  * */
+            $objPHPExcel = $objReader->load($path);
+            $total_sheets = $objPHPExcel->getSheetCount();
+            $allSheetName = $objPHPExcel->getSheetNames('template');
+
+            $objWorksheet = $objPHPExcel->getActiveSheet();
+            //$objWorksheet 		= 	$objPHPExcel->setActiveSheetIndex(1); 
+            $highestRow = $objWorksheet->getHighestRow();
+            $highestColumn = $objWorksheet->getHighestColumn();
+            $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+            $flag = 0;
+
+            $statement_data = array();
+            for ($row = 1; $row <= $highestRow; ++$row) {
+                for ($col = 0; $col < $highestColumnIndex; ++$col) {
+                    $value = $objWorksheet->getCellByColumnAndRow($col, $row)->getCalculatedValue();
+                    $arraydata[$row - 1][$col] = $value;
+                }
+                $temp = $arraydata[$row - 1];
+                /* Remove empty row from the statement */
+                $arrStr = '';
+                $arrStr = implode($temp);
+                if (count($temp) > 0 && strlen($arrStr) != 0) {
+                    $statement_data[] = $temp;
+                }
+            }
+            $arraydata = array_filter($statement_data);
+            $columns['columns'] = $arraydata;
+
+            $template_error = 0;
+
+            /* Check which template is uploaded */
+            /* if($count_one == count($arraydata[0]))
+              {
+              $uploaded_template 	= 	1;
+              }elseif($count_two == count($arraydata[0])){
+              $uploaded_template 	= 	2;
+              }else{
+              $template_error = 1;
+              } */
+            /* Check if uploaded template pattern is correct or not */
+            if (sizeOf($arraydata[0]) < 4)
+                $template_error = 1;
+            if ($template_error) {
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('BANK_UPLOAD_PATTERN_MATCH_ERROR');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response2['success'] = false;
+                $response2['error_msg'] = $msg;
+                $response2['url'] = site_url('bank_statements');
+                echo json_encode($response2);
+                die;
+            }
+
+            /* Check the column names now */
+            $error_flag = 0;
+
+            /* if($uploaded_template == 1)
+              {
+              $colSize = sizeOf($arraydata[0]);
+              if($colSize < 6 )
+              $error_flag = 1;
+              }elseif($uploaded_template == 2){
+              $colSize = sizeOf($arraydata[0]);
+              if($colSize < 7 )
+              $error_flag = 1;
+              } */
+
+            if ($error_flag == 1) {
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('BANK_UPLOAD_PATTERN_MATCH_ERROR');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response3['success'] = false;
+                $response3['error_msg'] = $msg;
+                $response3['url'] = site_url('bank_statements');
+                echo json_encode($response3);
+                die;
+            }
+
+            unset($arraydata[0]);
+            //echo '<pre>';print_r($arraydata);echo '</pre>';die;
+            if (count($arraydata) <= 0) {
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;' . $this->lang->line('BANK_UPLOAD_NO_RECORD') . '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response4['success'] = false;
+                $response4['error_msg'] = $msg;
+                $response4['url'] = site_url('bank_statements');
+                echo json_encode($response4);
+                die;
+            }
+
+            $file_data = array();
+            $match_details = array();
+            foreach ($arraydata as $key => $val) {
+                $col1 = array_search('Date', $matchColsTemplate);
+                $col2 = array_search('Type', $matchColsTemplate);
+                $col3 = array_search('Description', $matchColsTemplate);
+                $col4 = array_search('Value', $matchColsTemplate);
+                $col5 = array_search('Balance', $matchColsTemplate);
+                $col6 = array_search('Category', $matchColsTemplate);
+                $col7 = array_search('Money Out', $matchColsTemplate);
+                $col8 = array_search('Money In', $matchColsTemplate);
+                if (!empty($val[$col1])) {
+                    if ($inputFileType == 'CSV')
+                        $date = date("Y/m/d", strtotime($val[$col1]));
+                    else
+                        $date = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($val[$col1]));
+                }else {
+                    $date = trim($val[$col1]);
+                }
+
+                if ($val[$col4] != '' && $col4 != '') {
+                    $s_type = array_search($val[$col6], $statement_type);
+
+                    if ((float) $val[$col4] < 0) {
+                        $money_out = str_replace('-', '', (float) $val[$col4]);
+                        $money_in = '';
+                    } else {
+                        $money_in = str_replace('-', '', (float) $val[$col4]);
+                        $money_out = '';
+                    }
+
+                    if ($val[$col2] != '' && $col2 != '') {
+                        $match_details[] = array(
+                            'TransactionDate' => $date,
+                            'Type' => $val[$col2],
+                            'Description' => clean($val[$col3]),
+                            'MoneyOut' => $money_out,
+                            'MoneyIn' => $money_in,
+                            'Balance' => (float) $val[$col5],
+                            'Category' => array_search(trim($val[$col6]), $bank_categories),
+                            'StatementType' => $s_type
+                        );
+                    } else {
+                        $match_details[] = array(
+                            'TransactionDate' => $date,
+                            'Description' => clean($val[$col3]),
+                            'MoneyOut' => $money_out,
+                            'MoneyIn' => $money_in,
+                            'Balance' => (float) $val[$col5],
+                            'Category' => array_search(trim($val[$col6]), $bank_categories),
+                            'StatementType' => $s_type
+                        );
+                    }
+                } elseif ($col7 != '' && $col8 != '') {
+                    $s_type = array_search($val[$col6], $statement_type);
+
+                    if ($val[$col2] != '' && $col2 != '') {
+                        $match_details[] = array(
+                            'TransactionDate' => $date,
+                            'Type' => $val[$col2],
+                            'Description' => clean($val[$col3]),
+                            'MoneyOut' => (float) $val[$col7],
+                            'MoneyIn' => (float) $val[$col8],
+                            'Balance' => (float) $val[$col5],
+                            'Category' => array_search(trim($val[$col6]), $bank_categories),
+                            'StatementType' => $s_type
+                        );
+                    } else {
+                        $match_details[] = array(
+                            'TransactionDate' => $date,
+                            'Description' => clean($val[$col3]),
+                            'MoneyOut' => (float) $val[$col7],
+                            'MoneyIn' => (float) $val[$col8],
+                            'Balance' => (float) $val[$col5],
+                            'Category' => array_search(trim($val[$col6]), $bank_categories),
+                            'StatementType' => $s_type
+                        );
+                    }
+                }
+            }
+
+            /* Check if filed years enteries are entered or not */
+            $j_date = get_filed_year() . '<br>';
+            $error_row = array();
+            foreach ($match_details as $key => $val) {
+                if (strtotime(trim($val['TransactionDate'])) < strtotime($j_date)) {
+                    $error_row[] = $key + 1;
+                }
+            }
+            if (count($error_row) > 0) {
+                $error_row = implode(',', $error_row);
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= sprintf($this->lang->line('BANK_UPLOAD_FILED_YEAR_ENTRIES'), $error_row);
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response5['success'] = false;
+                $response5['error_msg'] = $msg;
+                $response5['url'] = site_url('bank_statements');
+                echo json_encode($response5);
+                die;
+            }
+
+            $duplicate_entry = array();
+            /* Check if statements already exists in the database */
+            $row = 2;
+            //pr($bank_categories);
+            foreach ($match_details as $key => $val) {
+                $val['Category'] = (empty($val['Category']) ? 0 : $val['Category']);
+                $val['Description'] = $val['Description'];
+                $response = $this->bank->check_duplicate_entry($val);
+                if ($response) {
+                    $duplicate_entry[] = $key + $row;
+                }
+            }
+            $duplicate_entry = implode(',', $duplicate_entry);
+            if (!empty($duplicate_entry)) {
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= sprintf($this->lang->line('BANK_UPLOAD_DUPPLIACATE_ENTRY'), $duplicate_entry);
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response6['success'] = false;
+                $response6['error_msg'] = $msg;
+                $response6['url'] = site_url('bank_statements');
+                echo json_encode($response6);
+                die;
+            }
+
+            $files = $_FILES['file'];
+
+            /* Save the bank Statement to the server folder */
+            $counter = $this->bank->getMaxFiles();
+            //$file_name = explode('.',$_FILES['file']['name']);
+            $file_name = 'Statement-' . cDate(date('Y-m-d')) . '-' . 'B-' . $counter . '.xls';
+            //die($file_name);
+            $config['upload_path'] = './assets/uploads/';
+            $config['allowed_types'] = '*';
+            $config['max_size'] = '1000';
+            $config['max_width'] = '1024';
+            $config['max_height'] = '768';
+            $config['file_name'] = $file_name;
+
+            $this->load->library('upload', $config);
+            if (!$this->upload->do_upload('file')) {
+                $error = $this->upload->display_errors();
+
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $error;
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response7['success'] = false;
+                $response7['error_msg'] = $msg;
+                $response7['url'] = site_url('bank_statements');
+                echo json_encode($response7);
+                die;
+            }
+
+            /* Save the file records in the database */
+            $file_data = array(
+                'FName' => $file_name,
+                'FType' => $files['type'],
+                'FSize' => $files['size'],
+                'UploadedOn' => date('Y-m-d'),
+                'UploadedBy' => $user['UserID'],
+                'Type' => 'B',
+                'AccountantAccess' => $access,
+            );
+            //echo '<pre>';print_r($file_data);echo '</pre>';die;
+            $file_id = $this->bank->saveFile($file_data);
+            if (empty($file_id)) {
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('UNEXPECTED_FILE_UPLOAD_ERROR');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response8['success'] = false;
+                $response8['error_msg'] = $msg;
+                $response8['url'] = site_url('bank_statements');
+                echo json_encode($response8);
+                die;
+            }
+
+            foreach ($match_details as $key => $val) {
+                $val['FileID'] = $file_id;
+                $val['AddedBy'] = $user['UserID'];
+                $val['AddedOn'] = date('Y-m-d');
+                $val['AccountantAccess'] = $access;
+                $val['AssociatedWith'] = 0;
+                $match_details[$key] = $val;
+            }
+
+            $allDescriptions = $this->bank->getBankStatementsDescriptions();
+            if (empty($allDescriptions))
+                $matchDescArray = json_decode(json_encode($match_details), True);
+            else {
+                $statementArry = json_decode(json_encode($match_details), True);
+                $matchDescArray = array_merge($allDescriptions, $statementArry);
+            }
+
+            $totalRecs = count($matchDescArray);
+            for ($i = 0; $i < $totalRecs; $i++) {
+                $releatedPercentage = array();
+                for ($j = 0; $j < $totalRecs; $j++) {
+                    $var_1 = '';
+                    $var_2 = '';
+                    if ($totalRecs > 1 && $match_details[$i]['Category'] == '' && $matchDescArray[$j]['Category'] != '') {
+                        $var_2 = str_replace(' ', '', $matchDescArray[$j]['Description']);
+                        $var_1 = str_replace(' ', '', $match_details[$i]['Description']);
+                        similar_text($var_1, $var_2, $percent);
+                        $releatedPercentage[$j] = number_format($percent, 2);
+                    } else {
+                        break;
+                    }
+                }
+                if (!empty($releatedPercentage)) {
+                    $val = max($releatedPercentage);
+                    $key = array_search($val, $releatedPercentage);
+                    if ($val > 50) {
+                        if ($key >= 0) {
+                            $match_details[$i]['Category'] = $matchDescArray[$key]['Category'];
+                            $match_details[$i]['StatementType'] = $matchDescArray[$key]['StatementType'];
+                        }
+                    }
+                }
+            }
+
+            //echo "<pre>";print_r($match_details);die;
+            /* Temporary Store the details in session */
+            $details = json_encode($match_details);
+
+            $_SESSION['bank_statements'] = $details;
+            //echo "<pre>";print_r($this->session->all_userdata());echo "</pre>";die;
+            $this->session->set_userdata('statement_file_id', $file_id);
+            $response9['success'] = true;
+            $response9['statement_file_id'] = $file_id;
+            $response9['url'] = site_url('bank_statements/before_upload');
+            echo json_encode($response9);
+            die;
+        } else {
+            show_404();
+        }
+    }
+
+    public function addBankStatement() {
+        /* Get the statements from the session */
+        //$_SESSION['bank_statements'] = '';
+        $statements = $_SESSION['bank_statements'];
+        $statements = json_decode($statements);
+        //echo "<pre>";print_r($statements);
+        $user = $this->session->userdata('user');
+        $access = clientAccess();
+
+        if (empty($statements)) {
+            $statements1['TransactionDate'] = date('Y-m-d');
+            $statements1['Type'] = '';
+            $statements1['Description'] = '';
+            $statements1['MoneyOut'] = '';
+            $statement1['MoneyIn'] = '';
+            $statements1['Balance'] = '';
+            $statements1['Category'] = '';
+            $statements1['StatementType'] = '';
+            $statements1['AddedBy'] = $user['UserID'];
+            $statements1['AddedOn'] = date('Y-m-d');
+            $statements1['AccountantAccess'] = $access;
+            $statements1['AssociatedWith'] = 0;
+            $statements[0] = (object) $statements1;
+        }
+        $data['page'] = "banks";
+        $data['page1'] = "addmanual";
+        $data['title'] = "Cashman | Bank Uploads";
+
+        $data['items'] = $statements;
+        $user = $this->session->userdata('user');
+        $data['getbanks'] = $this->bank->getBanks($user['CompanyID']);
+        //echo "<pre>";print_r($data);die;
+        $this->load->view('client/banks/statements_edit', $data);
+    }
+
+    public function before_upload() {
+        /* Get the statements from the session */
+
+        $statements = $_SESSION['bank_statements'];
+
+        //echo 'First : <pre>';print_r($statements);echo '</pre>';
+        $statements = json_decode($statements);
+        //echo 'First : <pre>'.count($statements);die;
+
+        if (count($statements) <= 0) {
+            setRedirect(site_url() . 'bank_statements');
+        }
+        $data['page'] = "banks";
+        $data['page1'] = "excelupload";
+        $data['title'] = "Cashman | Bank Uploads";
+        /*
+          if(count($statements) <= 0)
+          {
+          $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+          $msg .= $this->lang->line('UNEXPECTED_FILE_UPLOAD_ERROR');
+          $msg .= '</div>';
+          $this->session->set_flashdata('bankError',$msg);
+          }
+         */
+        $data['items'] = $statements;
+		$user = $this->session->userdata('user');
+        $data['getbanks'] = $this->bank->getBanks($user['CompanyID']);
+        $this->load->view('client/banks/statements_edit', $data);
+    }
+
+    public function template_one() {
+        $categories = $this->bank->getStatementCategories();
+        sort($categories);
+        //echo "<pre>";print_r($categories);die;
+        require_once(APPPATH . 'third_party/PHPExcel.php');
+        //require_once(APPPATH.'third_party/PHPExcel/Writer/Excel2007.php');
+        $name = "bank_statement_(+/-)";
+        $type = array(
+            '1' => 'BAC',
+            '2' => 'DPC',
+            '3' => 'D/D',
+            '4' => 'S/O',
+        );
+
+        $setStyle = array(
+            'font' => array(
+                'name' => 'Arial',
+                'size' => 12,
+                'bold' => TRUE,
+                'color' => array(
+                    'rgb' => 'FFFFFF'
+                ),
+            ),
+            'borders' => array(
+                'bottom' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+                'right' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+                'top' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+                'left' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'startcolor' => array(
+                    'rgb' => '2685E1',
+                ),
+            ),
+        );
+
+        $objPHPExcel = new PHPExcel();
+
+        $objPHPExcel->setActiveSheetIndex(0);
+        //$objPHPExcel->getActiveSheet()->setCellValue('A1', 'EmployeeName');
+        // Rename sheet
+        $objPHPExcel->getActiveSheet()->setTitle('TransactionType');
+        for ($x = 0; $x < count($categories); $x++) {
+            $objPHPExcel->getActiveSheet()->setCellValue('A' . ($x + 1), $categories[$x]);
+        }
+
+        for ($x = 1; $x <= count($type); $x++) {
+            $objPHPExcel->getActiveSheet()->setCellValue('B' . $x, $type[$x]);
+        }
+
+        $objPHPExcel->createSheet();
+
+        $objPHPExcel->setActiveSheetIndex(1);
+        $objPHPExcel->getActiveSheet()->setTitle('Bank Statement One');
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(60);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(30);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:F1')->applyFromArray($setStyle);
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Date');
+        $objPHPExcel->getActiveSheet()->setCellValue('B1', 'Type');
+        $objPHPExcel->getActiveSheet()->setCellValue('C1', 'Description');
+        $objPHPExcel->getActiveSheet()->setCellValue('D1', 'Value');
+        $objPHPExcel->getActiveSheet()->setCellValue('E1', 'Balance');
+        $objPHPExcel->getActiveSheet()->setCellValue('F1', 'Category');
+
+        for ($x = 1; $x < 300; $x++) {
+            $objValidation = $objPHPExcel->getActiveSheet()->getCell('F' . ($x + 1))->getDataValidation();
+            $objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+            $objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+            $objValidation->setAllowBlank(false);
+            $objValidation->setShowInputMessage(true);
+            $objValidation->setShowErrorMessage(true);
+            $objValidation->setShowDropDown(true);
+            $objValidation->setFormula1('TransactionType!$A$1:$A$' . (count($categories)));
+        }
+
+        for ($x = 1; $x < 300; $x++) {
+            $objValidation = $objPHPExcel->getActiveSheet()->getCell('B' . ($x + 1))->getDataValidation();
+            $objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+            $objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+            $objValidation->setAllowBlank(false);
+            $objValidation->setShowInputMessage(true);
+            $objValidation->setShowErrorMessage(true);
+            $objValidation->setShowDropDown(true);
+            $objValidation->setFormula1('TransactionType!$B$1:$B$' . (count($type)));
+        }
+        $objPHPExcel->getSheetByName('TransactionType')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $name . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+    }
+
+    public function template_two() {
+        $categories = $this->bank->getStatementCategories();
+        sort($categories);
+        require_once(APPPATH . 'third_party/PHPExcel.php');
+        $name = "bank_statement_(IN/OUT)";
+        $type = array(
+            '1' => 'BAC',
+            '2' => 'DPC',
+            '3' => 'D/D',
+            '4' => 'S/O',
+        );
+
+        $setStyle = array(
+            'font' => array(
+                'name' => 'Arial',
+                'size' => 12,
+                'bold' => TRUE,
+                'color' => array(
+                    'rgb' => 'FFFFFF'
+                ),
+            ),
+            'borders' => array(
+                'bottom' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+                'right' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+                'top' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+                'left' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array(
+                        'rgb' => '000000'
+                    )
+                ),
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'startcolor' => array(
+                    'rgb' => '2685E1',
+                ),
+            ),
+        );
+
+        $objPHPExcel = new PHPExcel();
+
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        $objPHPExcel->getActiveSheet()->setTitle('TransactionType');
+        for ($x = 0; $x < count($categories); $x++) {
+            $objPHPExcel->getActiveSheet()->setCellValue('A' . ($x + 1), $categories[$x]);
+        }
+
+        for ($x = 1; $x <= count($type); $x++) {
+            $objPHPExcel->getActiveSheet()->setCellValue('B' . $x, $type[$x]);
+        }
+        $objPHPExcel->createSheet();
+        $objPHPExcel->setActiveSheetIndex(1);
+        $objPHPExcel->getActiveSheet()->setTitle('Bank Statement One');
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(60);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(30);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:G1')->applyFromArray($setStyle);
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Date');
+        $objPHPExcel->getActiveSheet()->setCellValue('B1', 'Type');
+        $objPHPExcel->getActiveSheet()->setCellValue('C1', 'Description');
+        $objPHPExcel->getActiveSheet()->setCellValue('D1', 'Money Out');
+        $objPHPExcel->getActiveSheet()->setCellValue('E1', 'Money In');
+        $objPHPExcel->getActiveSheet()->setCellValue('F1', 'Balance');
+        $objPHPExcel->getActiveSheet()->setCellValue('G1', 'Category');
+
+        for ($x = 1; $x < 300; $x++) {
+            $objValidation = $objPHPExcel->getActiveSheet()->getCell('G' . ($x + 1))->getDataValidation();
+            $objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+            $objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+            $objValidation->setAllowBlank(false);
+            $objValidation->setShowInputMessage(true);
+            $objValidation->setShowErrorMessage(true);
+            $objValidation->setShowDropDown(true);
+            $objValidation->setFormula1('TransactionType!$A$1:$A$' . (count($categories)));
+        }
+
+        for ($x = 1; $x < 300; $x++) {
+            $objValidation = $objPHPExcel->getActiveSheet()->getCell('B' . ($x + 1))->getDataValidation();
+            $objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+            $objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+            $objValidation->setAllowBlank(false);
+            $objValidation->setShowInputMessage(true);
+            $objValidation->setShowErrorMessage(true);
+            $objValidation->setShowDropDown(true);
+            $objValidation->setFormula1('TransactionType!$B$1:$B$' . (count($type)));
+        }
+        $objPHPExcel->getSheetByName('TransactionType')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $name . '.xlsx"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+    }
+
+    public function cancelAddManualStatement() {
+        setRedirect(site_url() . 'bank_statements');
+    }
+
+    public function cancel() {
+        $file_id = $this->session->userdata('statement_file_id');
+        if (empty($file_id)) {
+            show_404();
+        }
+
+        $ids = $this->bank->getFileStatements($file_id);
+        $response = $this->bank->deleteFile($file_id);
+        if (!$response) {
+            $msg = '<div class="alert alert-danger">';
+            $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+            $msg .= $this->lang->line('BANK_STATEMENT_CANCEL_ERROR');
+            $msg .= '</div>';
+            $this->session->set_flashdata('bankError', $msg);
+            setRedirect(site_url() . 'bank_statements');
+        }
+
+        $bank_statements = $_SESSION['bank_statements'];
+        $bank_statements = json_decode($bank_statements);
+        $item_ids = array();
+        foreach ($bank_statements as $key => $val) {
+            if ($val->AssociatedWith != 0) {
+                $item_ids[] = array(
+                    'ItemID' => $val->AssociatedWith,
+                    'ItemType' => $val->StatementType
+                );
+            }
+        }
+        $response = $this->bank->delete_statement_record($item_ids);
+        if (!$response) {
+            $msg = '<div class="alert alert-danger">';
+            $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+            $msg .= $this->lang->line('BANK_STATEMENT_CANCEL_ERROR');
+            $msg .= '</div>';
+            $this->session->set_flashdata('bankError', $msg);
+            setRedirect(site_url() . 'bank_statements');
+        }
+        $_SESSION['bank_statements'] = '';
+        $this->session->set_userdata('statement_file_id', '');
+        setRedirect(site_url() . 'bank_statements');
+    }
+
+    public function save_statements() {
+        $bank_statements = $_SESSION['bank_statements'];
+
+        $bankId = $this->input->post('bankId');
+        if (empty($bank_statements)) {
+            //show_404();
+        }
+
+        $bank_statements = json_decode($bank_statements);
+        $statement_date = $this->input->post('Date');
+        $statement_type = $_POST['Type'];
+        $statement_desc = $_POST['Description'];
+        $statement_mo = $_POST['MoneyOut'];
+        $statement_mi = $_POST['MoneyIn'];
+        $statement_bal = $_POST['Balance'];
+        $statement_cat = $_POST['Category'];
+
+        $match_details = array();
+
+        $item_ids = array();
+        $check_balance = 0;
+
+        foreach ($bank_statements as $key => $val) {
+            //$match_details[] = get_object_vars($val);
+
+            if ($key == 0) {
+
+                $starting_balance = company_starting_balance(mDate($statement_date[$key]));
+                $cc_balance = $this->bank->get_current_balance();
+                $cc_balance = $cc_balance['Balance'];
+                if ($cc_balance == 0) {
+                    $check_balance = $starting_balance;
+                } else {
+                    $check_balance = $cc_balance + $statement_mi[$key] - $statement_mo[$key];
+                }
+            } else {
+                $check_balance = 0;
+            }
+            if (isset($val->FileID) != "") {
+                $FileID = $val->FileID;
+            } else {
+                $FileID = '0';
+            }
+
+            $match_details[] = array(
+                'TransactionDate' => mDate($statement_date[$key]),
+                'Type' => $statement_type[$key],
+                'Description' => clean($statement_desc[$key]),
+                'MoneyOut' => (float) $statement_mo[$key],
+                'MoneyIn' => (float) $statement_mi[$key],
+                'Balance' => (float) $statement_bal[$key],
+                'Category' => $statement_cat[$key],
+                'StatementType' => $val->StatementType,
+                'FileID' => $FileID,
+                'AddedBy' => $val->AddedBy,
+                'AddedOn' => $val->AddedOn,
+                'AccountantAccess' => $val->AccountantAccess,
+                'AssociatedWith' => $val->AssociatedWith,
+                'CheckBalance' => $check_balance
+            );
+            if ($val->AssociatedWith != 0) {
+                $item_ids[] = $val->AssociatedWith;
+            }
+        }
+
+        $_SESSION['bank_statements'] = '';
+        $_SESSION['bankId'] = '';
+        $this->session->set_userdata('temp_statement_record', '');
+        $duplicate_entry = array();
+        /* Check if statements already exists in the database */
+        $row = 1;
+        foreach ($match_details as $key => $val) {
+            $val['Category'] = (empty($val['Category'])) ? 0 : $val['Category'];
+            $response = $this->bank->check_duplicate_entry($val);
+            if ($response) {
+                $duplicate_entry[] = $key + $row;
+            }
+        }
+
+        $duplicate_entry = implode(',', $duplicate_entry);
+
+        if (!empty($duplicate_entry)) {
+            $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+            $msg .= sprintf($this->lang->line('BANK_UPLOAD_DUPPLIACATE_ENTRY'), $duplicate_entry);
+            $msg .= '</div>';
+            $this->session->set_flashdata('bankUploadError', $msg);
+            $duplicate_statements = json_encode($match_details);
+            $_SESSION['bank_statements'] = $duplicate_statements;
+            setRedirect($_SERVER['HTTP_REFERER']);
+        }
+
+        /* STEP - 1 Save the bank statements */
+        // $response = $this->bank->save_statements($match_details);
+        $randomno = rand(1000, 100000);
+        foreach ($match_details as $key => $value) {
+            $match_details[$key]['Randomnumber'] = $randomno;
+        }
+        $match_details = $this->bank->save_statements($match_details, $bankId);
+        update_logs('BANK', 'BANK_STATEMENT_UPLOADED', 'INSERT', "", "$randomno");
+        if (!$match_details) {
+            $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+            $msg .= $this->lang->line('UNEXPECTED_ERROR_OCCURED');
+            $msg .= '</div>';
+            $this->session->set_flashdata('bankError', $msg);
+            setRedirect('bank_statements');
+        }
+        /* added For P/L and B/S entries */ else {
+            if (count($match_details) > 0) {
+                foreach ($match_details as $SEntry) {
+
+                    $catKey = get_expenses_category($SEntry['Category']);
+                    // prd( $catKey );
+                    if ($catKey && !empty($catKey["key"])) {
+
+                        if (!empty($SEntry["MoneyOut"])) {
+                            $amount = $SEntry["MoneyOut"];
+                            $tType = "MONEY_OUT";
+                        } else if (!empty($SEntry["MoneyIn"])) {
+                            $amount = $SEntry["MoneyIn"];
+                            $tType = "MONEY_IN";
+                        } else {
+                            $amount = 0;
+                            $tType = "MONEY_IN";
+                        }
+                        $paidDate = $SEntry["TransactionDate"];
+                        $id = $SEntry["id"];
+
+                        switch ($catKey["key"]) {
+
+                            case "SALES":
+                                $invData = array("id" => $id, "PaidOn" => $paidDate, "InvoiceTotal" => $amount);
+                                update_trial_balance("invoice", $invData, "BANK", $tType);
+                                break;
+
+                            case "EXPENSE_SUSPENSE":
+                            case "CREDIT_CARD_SUSPENSE":
+                                $expData = array("id" => $id, "PaidOn" => $paidDate, "Amount" => $amount, "ExpenseType" => $catKey["key"]);
+                                update_trial_balance("expense", $expData, "BANK", $tType);
+                                break;
+
+                            case "SALARY":
+                                $saldata = array("id" => $id, "PaidDate" => $paidDate, "GrossSalary" => $amount);
+                                update_trial_balance("salary", $saldata, "BANK", $tType);
+                                break;
+
+                            case "PAYEE_CONTROL":
+                                $paydata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                update_trial_balance("payee", $paydata, "BANK", $tType);
+                                break;
+
+                            case "VAT_CONTROL":
+                                $vatdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                update_trial_balance("vat", $vatdata, "BANK", $tType);
+                                break;
+
+                            case "DIVIDEND":
+                                $divdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                update_trial_balance("dividend", $divdata, "BANK", $tType);
+                                break;
+
+                            default:
+
+                                $user = $this->session->userdata('user');
+                                if (isset($user["AccountantAccess"]) && !empty($user["AccountantAccess"])) {
+                                    $aAccess = $user["AccountantAccess"];
+                                } else {
+                                    $aAccess = $user["UserID"];
+                                }
+                                $tbSource = "BANK"; // Used for TB Details no relation to Any other variable used Above
+
+                                if ($tType == "MONEY_IN") {
+                                    // "Cash at bank" goes down by "Total amount"
+                                    $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                    $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                    if ((int) $TBentryId > 0) {
+                                        add_trial_details($TBCatId, $paidDate, $tbSource, "CASH_AT_BANK", $aAccess, $id, $amount, "");
+                                    }
+
+                                    // "Same category" goes up by "Total amount" 
+                                    $TBCatId = get_trial_balance_category($catKey["key"]); //get category ID for given key
+                                    if ($TBCatId) {
+                                        $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                        if ((int) $TBentryId > 0) {
+                                            add_trial_details($TBCatId, $paidDate, $tbSource, $catKey["key"], $aAccess, $id, $amount, "", "SUBTRACT");
+                                        }
+                                    }
+                                } else if ($tType == "MONEY_OUT") {
+
+                                    // "Cash at bank" goes down by "Total amount"
+                                    $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                    $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                    if ((int) $TBentryId > 0) {
+                                        add_trial_details($TBCatId, $paidDate, $tbSource, "CASH_AT_BANK", $aAccess, $id, $amount, "", "SUBTRACT");
+                                    }
+
+                                    // "Same category" goes up by "Total amount" 
+                                    $TBCatId = get_trial_balance_category($catKey["key"]); //get category ID for given key
+                                    if ($TBCatId) {
+                                        $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                        if ((int) $TBentryId > 0) {
+                                            add_trial_details($TBCatId, $paidDate, $tbSource, $catKey["key"], $aAccess, $id, $amount, "");
+                                        }
+                                    }
+                                }
+
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        $dividend_statement_id = '';
+        $invoice_statement_id = '';
+
+        /* STEP - 2 Get Statement IDS for Dividend IDS */
+        $raw_record = array();
+        $dividend_ids = array();
+        $invoice_ids = array();
+        if (count($item_ids) > 0) {
+            $raw_record = $this->bank->get_statement_ids($item_ids);
+            foreach ($raw_record as $key => $val) {
+                if ($val->StatementType == 'D') {
+                    $dividend_ids[] = array(
+                        'DID' => $val->AssociatedWith,
+                        'BankStatement' => $val->ID
+                    );
+                } elseif ($val->StatementType == 'I') {
+                    $invoice_ids[] = array(
+                        'InvoiceID' => $val->AssociatedWith,
+                        'BankStatement' => $val->ID
+                    );
+                }
+            }
+        }
+
+        /* Update Dividend Table */
+        if (count($dividend_ids) > 0) {
+            $response = $this->bank->updateStatements($dividend_ids, 'D');
+            if (!$response) {
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('UNEXPECTED_ERROR_OCCURED');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                setRedirect('bank_statements');
+            }
+        }
+        //echo '<pre>';print_r($dividend_ids);echo '</pre>';
+        //echo '<pre>';print_r($invoice_ids);echo '</pre>';die;
+
+        /* Update Invoice Table */
+        if (count($invoice_ids) > 0) {
+            $response = $this->bank->updateStatements($invoice_ids, 'I');
+            if (!$response) {
+                $msg = '<div class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('UNEXPECTED_ERROR_OCCURED');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                setRedirect('bank_statements');
+            }
+        }
+
+        /* If no error then return true */
+        $msg = '<div class="alert alert-success">';
+        $msg .= '<i class="glyphicon glyphicon-ok"></i>';
+        $msg .= $this->lang->line('BANK_STATEMENTS_ADDED_SUCCESSFULLY');
+        $msg .= '</div>';
+        $this->session->set_flashdata('bankError', $msg);
+        setRedirect('bank_statements');
+    }
+
+    public function search() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $search = array(
+                'Description' => safe($_POST['Description']),
+                'StartDate' => safe($_POST['StartDate']),
+                'EndDate' => safe($_POST['EndDate']),
+                'Category' => safe($_POST['Category']),
+                'FinancialYear' => safe($_POST['FinancialYear'])
+            );
+            $this->session->set_userdata('BankSearch', $search);
+            setRedirect('bank_statements');
+        } else {
+            show_404();
+        }
+    }
+
+    public function clean() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->session->set_userdata('BankSearch', '');
+            $this->session->set_userdata('bankSearchRecords', '');
+            $data['items'] = $this->bank->getItems(BANK_PAGINATION_LIMIT, 0);
+            $json = array();
+            $total = $this->bank->totalEntries();
+            $json['pagination'] = $this->getPagination('clients/expenses', BANK_PAGINATION_LIMIT, $total);
+            $data['current_balance'] = $this->bank->get_current_balance();
+            $data['current_balance'] = $data['current_balance']['Balance'];
+            //$data['vat_listing']	=	$this->expense->getVatType();
+            $json['html'] = $this->load->view('client/banks/bank_listing', $data, TRUE);
+            echo json_encode($json);
+            exit;
+        } else {
+            show_404();
+        }
+    }
+
+    public function delete_statements() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $ids = $_POST['cb'];
+            foreach ($ids as $key => $val) {
+                $ids[$key] = $this->encrypt->decode($val);
+            }
+
+            /* Added for P/L & B/S entries */
+            $delDetails = $this->bank->getDeleteEntryDetails($ids);
+            /* Added for P/L & B/S entries */
+
+            $response = $this->bank->delete_statements($ids);
+            if (!$response) {
+                $msg = '<div class="alert alert-danger">';
+                $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('UNEXPECTED_ERROR_OCCURED');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                setRedirect(site_url() . 'bank_statements');
+            } else {
+
+                /* Added for P/L & B/S entries */
+                if ($delDetails) {
+                    foreach ($delDetails as $SEntry) {
+                        if (!empty($SEntry["key"])) {
+
+                            if (!empty($SEntry["MoneyOut"])) {
+                                $amount = $SEntry["MoneyOut"];
+                                $tType = "MONEY_OUT";
+                            } else if (!empty($SEntry["MoneyIn"])) {
+                                $amount = $SEntry["MoneyIn"];
+                                $tType = "MONEY_IN";
+                            } else {
+                                $amount = 0;
+                                $tType = "MONEY_IN";
+                            }
+                            $paidDate = $SEntry["TransactionDate"];
+                            $id = $SEntry["id"];
+                            switch ($SEntry["key"]) {
+
+                                case "SALES":
+                                    $invData = array("id" => $id, "PaidOn" => $paidDate, "InvoiceTotal" => $amount);
+                                    update_trial_balance("invoice", $invData, "BANK_DEL", $tType);
+                                    break;
+
+                                case "EXPENSE_SUSPENSE":
+                                case "CREDIT_CARD_SUSPENSE":
+                                    $expData = array("id" => $id, "PaidOn" => $paidDate, "Amount" => $amount, "ExpenseType" => $SEntry["key"]);
+                                    update_trial_balance("expense", $expData, "BANK_DEL", $tType);
+                                    break;
+
+                                case "SALARY":
+                                    $saldata = array("id" => $id, "PaidDate" => $paidDate, "GrossSalary" => $amount);
+                                    update_trial_balance("salary", $saldata, "BANK_DEL", $tType);
+                                    break;
+
+                                case "PAYEE_CONTROL":
+                                    $paydata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                    update_trial_balance("payee", $paydata, "BANK_DEL", $tType);
+                                    break;
+
+                                case "VAT_CONTROL":
+                                    $vatdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                    update_trial_balance("vat", $vatdata, "BANK_DEL", $tType);
+                                    break;
+
+                                case "DIVIDEND":
+                                    $divdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                    update_trial_balance("dividend", $divdata, "BANK_DEL", $tType);
+                                    break;
+
+                                default:
+
+                                    $user = $this->session->userdata('user');
+                                    if (isset($user["AccountantAccess"]) && !empty($user["AccountantAccess"])) {
+                                        $aAccess = $user["AccountantAccess"];
+                                    } else {
+                                        $aAccess = $user["UserID"];
+                                    }
+                                    $tbSource = "BANK"; // Used for TB Details no relation to Any other variable used Above 
+
+                                    if ($tType == "MONEY_IN") {
+                                        // "Cash at bank" goes down by "Total amount"
+                                        $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                        $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                        if ((int) $TBentryId > 0) {
+                                            rm_trial_details($tbSource, "CASH_AT_BANK", $id);
+                                        }
+
+                                        // "Same category" goes up by "Total amount" 
+                                        $TBCatId = get_trial_balance_category($SEntry["key"]); //get category ID for given key
+                                        if ($TBCatId) {
+                                            $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                            if ((int) $TBentryId > 0) {
+                                                rm_trial_details($tbSource, $SEntry["key"], $id);
+                                            }
+                                        }
+                                    } else if ($tType == "MONEY_OUT") {
+                                        // "Cash at bank" goes down by "Total amount"
+                                        $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                        $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                        if ((int) $TBentryId > 0) {
+                                            rm_trial_details($tbSource, "CASH_AT_BANK", $id);
+                                        }
+
+                                        // "Same category" goes up by "Total amount" 
+                                        $TBCatId = get_trial_balance_category($SEntry["key"]); //get category ID for given key
+                                        if ($TBCatId) {
+                                            $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                            if ((int) $TBentryId > 0) {
+                                                rm_trial_details($tbSource, $SEntry["key"], $id);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+                            }
+                        }
+                    }
+                }
+                /* Added for P/L & B/S entries */
+
+                $msg = '<div class="alert alert-success">';
+                $msg .= '<i class="glyphicon glyphicon-ok"></i>';
+                $msg .= $this->lang->line('BANK_STATEMENT_DELETE_SUCCESS');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                setRedirect('bank_statements');
+            }
+        } else {
+            show_404();
+        }
+    }
+
+    public function viewDividends() {
+        $data['prev_dividends'] = $this->bank->get_previous_dividends();
+        $json['html'] = $this->load->view('client/dividend/previous_dividend', $data, true);
+        echo json_encode($json);
+        die;
+    }
+
+    public function viewInvoices() {
+        $data['prev_invoices'] = $this->bank->get_previous_invoices();
+        $json['html'] = $this->load->view('client/invoices/previous_invoices', $data, true);
+        echo json_encode($json);
+        die;
+    }
+
+    /*     * ************ updating session on add new Row and on remove row ******** */
+
+    public function updateStatementsSession() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+			//echo "<pre>";print_r($_POST);die('lol');
+            $_SESSION['bank_statements'] = '';
+            $_SESSION['bankId'] = '';
+            //$statements = json_decode($statements);		
+            $categories = array(
+                '0' => 75,
+                '1' => 78
+            );
+            $user = $this->session->userdata('user');
+            $access = clientAccess();
+            $statements = array();
+
+            for ($i = 0; $i < count($_POST['Category']); $i++) {
+                $statement = new stdClass();
+                $statement->TransactionDate = '';
+                $statement->TransactionDate = mDate($_POST['Date'][$i]);
+                $statement->Type = $_POST['Type'][$i];
+                $statement->Description = $_POST['Description'][$i];
+                $statement->MoneyOut = $_POST['MoneyOut'][$i];
+                $statement->MoneyIn = $_POST['MoneyIn'][$i];
+                $statement->Balance = $_POST['Balance'][$i];
+                $statement->Category = $_POST['Category'][$i];
+                $statement->AddedBy = $user['UserID'];
+                $statement->AddedOn = date('Y-m-d');
+                $statement->AccountantAccess = $access;
+                $statement->AssociatedWith = 0;
+                if (!in_array($_POST['Category'][$i], $categories)) {
+                    $statement->StatementType = '';
+                } else {
+                    if ($_POST['Category'][$i] == 75) {
+                        $statement->StatementType = 'I';
+                    } elseif ($_POST['Category'][$i] == 78) {
+                        $statement->StatementType = 'D';
+                    }
+                }
+                $statements[$i] = $statement;
+            }
+
+            $allDescriptions = $this->bank->getBankStatementsDescriptions();
+
+            if (empty($allDescriptions))
+                $matchDescArray = json_decode(json_encode($statements), True);
+            else {
+                $statementArry = json_decode(json_encode($statements), True);
+                $matchDescArray = array_merge($allDescriptions, $statementArry);
+            }
+            $totalRecs = count($matchDescArray);
+            for ($i = 0; $i < count($statementArry); $i++) {
+                $releatedPercentage = array();
+                for ($j = 0; $j < $totalRecs; $j++) {
+                    $var_1 = '';
+                    $var_2 = '';
+                    if ($totalRecs > 1 && $statements[$i]->Category == 0 && $matchDescArray[$j]['Category'] != 0) {
+                        $var_2 = str_replace(' ', '', $matchDescArray[$j]['Description']);
+                        $var_1 = str_replace(' ', '', $statements[$i]->Description);
+                        similar_text($var_1, $var_2, $percent);
+                        $releatedPercentage[$j] = number_format($percent, 2);
+                    } else {
+                        break;
+                    }
+                }
+                if (!empty($releatedPercentage)) {
+                    $valMax = max($releatedPercentage);
+                    $keyMax = array_search($valMax, $releatedPercentage);
+                    if ($valMax > 50) {
+                        if ($keyMax >= 0) {
+                            $statements[$i]->Category = $matchDescArray[$keyMax]['Category'];
+                            $statements[$i]->StatementType = $matchDescArray[$keyMax]['StatementType'];
+                        }
+                    }
+                }
+            }
+            $statements = json_encode($statements);
+            $_SESSION['bank_statements'] = $statements;
+            $_SESSION['bankId'] = $this->input->post('bankId');
+        }
+    }
+
+    public function change_category() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $statements = $_SESSION['bank_statements'];
+            $statements = json_decode($statements);
+            $categories = array(
+                '0' => 75,
+                '1' => 78
+            );
+
+            $statement_date = $_POST['Date'];
+            $statement_type = $_POST['Type'];
+            $statement_desc = $_POST['Description'];
+            $statement_mo = $_POST['MoneyOut'];
+            $statement_mi = $_POST['MoneyIn'];
+            $statement_bal = $_POST['Balance'];
+            $statement_cat = $_POST['Category'];
+            //pr($_POST);
+            //echo "<pre>";print_r($_POST);die('d');
+            $totalRecs = count($statements);
+            foreach ($statements as $key => $val) {
+                $statements[$key]->TransactionDate = mDate($statement_date[$key]);
+                $statements[$key]->Type = $statement_type[$key];
+                $statements[$key]->Description = $statement_desc[$key];
+                $statements[$key]->MoneyOut = $statement_mo[$key];
+                $statements[$key]->MoneyIn = $statement_mi[$key];
+                $statements[$key]->Balance = $statement_bal[$key];
+                $statements[$key]->Category = $statement_cat[$key];
+				$statements[$key]->CategoryParent = exCategoriesParentName($statement_cat[$key]);
+                if (!in_array($val->Category, $categories)) {
+                    $statements[$key]->StatementType = '';
+                } else {
+                    if ($val->Category == 75) {
+                        $statements[$key]->StatementType = 'I';
+                    } elseif ($val->Category == 78) {
+                        $statements[$key]->StatementType = 'D';
+                    }
+                }
+            }
+
+            $allDescriptions = $this->bank->getBankStatementsDescriptions();
+            if (empty($allDescriptions))
+                $matchDescArray = json_decode(json_encode($statements), True);
+            else {
+                $statementArry = json_decode(json_encode($statements), True);
+                $matchDescArray = array_merge($allDescriptions, $statementArry);
+            }
+            $totalRecs = count($matchDescArray);
+            for ($i = 0; $i < $totalRecs; $i++) {
+                $releatedPercentage = array();
+                for ($j = 0; $j < $totalRecs; $j++) {
+                    $var_1 = '';
+                    $var_2 = '';
+                    if ($totalRecs > 1 && $statements[$i]->Category == 0 && $matchDescArray[$j]['Category'] != 0) {
+                        $var_2 = str_replace(' ', '', $matchDescArray[$j]['Description']);
+                        $var_1 = str_replace(' ', '', $statements[$i]->Description);
+                        similar_text($var_1, $var_2, $percent);
+                        $releatedPercentage[$j] = number_format($percent, 2);
+                    } else {
+                        break;
+                    }
+                }
+                if (!empty($releatedPercentage)) {
+                    $valMax = max($releatedPercentage);
+                    $keyMax = array_search($valMax, $releatedPercentage);
+                    if ($valMax > 50) {
+                        if ($keyMax >= 0) {
+                            $statements[$i]->Category = $matchDescArray[$keyMax]['Category'];
+                            $statements[$i]->StatementType = $matchDescArray[$keyMax]['StatementType'];
+                        }
+                    }
+                }
+            }
+            //echo "<pre>";print_r($statements);die('dd');
+            $statements = json_encode($statements);
+            $_SESSION['bank_statements'] = $statements;
+            $_SESSION['bankId'] = $this->input->post('bankId');
+			echo $statements; exit;
+        } else {
+            show_404();
+        }
+    }
+
+    public function update_statement_category() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $statementId = $_POST['dataId'];
+            $prev_catId = $_POST['previous_cat'];
+            $new_catId = $_POST['new_Cat'];
+
+            if ($statementId == '' || $prev_catId == '' || $new_catId == '') {
+                $msg = '<div class="alert alert-danger">';
+                $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('BANK_UPLOAD_FILE_ERROR');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response1['success'] = false;
+                $response1['error_msg'] = $msg;
+                $response1['url'] = site_url('bank_statements');
+                echo json_encode($response1);
+                die;
+            }
+            $statementId = $this->encrypt->decode($statementId);
+            /* Added for P/L & B/S entries */
+            $statementDetails = $this->bank->getBankStatementDetail($statementId);
+            /* Added for P/L & B/S entries */
+            if (empty($statementDetails)) {
+                $msg = '<div class="alert alert-danger">';
+                $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                $msg .= $this->lang->line('BANK_UPLOAD_FILE_ERROR');
+                $msg .= '</div>';
+                $this->session->set_flashdata('bankError', $msg);
+                $response1['success'] = false;
+                $response1['error_msg'] = $msg;
+                $response1['url'] = site_url('bank_statements');
+                echo json_encode($response1);
+                die;
+            } else {
+                $response = $this->bank->update_statementsCategory($statementId, $new_catId);
+                //echo "<pre>";print_r($statementDetails);
+                if (count($statementDetails) > 0) {
+
+                    $SEntry = $statementDetails;
+                    $catKey = get_expenses_category($SEntry->Category);
+                    if ($catKey && !empty($catKey["key"])) {
+                        if (!empty($SEntry->MoneyOut)) {
+                            $amount = $SEntry->MoneyOut;
+                            $tType = "MONEY_OUT";
+                        } else if (!empty($SEntry->MoneyIn)) {
+                            $amount = $SEntry->MoneyIn;
+                            $tType = "MONEY_IN";
+                        } else {
+                            $amount = 0;
+                            $tType = "MONEY_IN";
+                        }
+                        $paidDate = $SEntry->TransactionDate;
+                        $id = $SEntry->id;
+                        echo $catKey["key"];
+                        $expData = array("id" => $id, "PaidOn" => $paidDate, "Amount" => $amount, "ExpenseType" => $catKey["key"]);
+                        //   echo "<pre>"; print_r($expData); die('lol');
+                        switch ($catKey["key"]) {
+
+                            case "SALES":
+                                $invData = array("id" => $id, "PaidOn" => $paidDate, "InvoiceTotal" => $amount);
+                                update_trial_balance("invoice", $invData, "BANK", $tType);
+                                break;
+
+                            case "EXPENSE_SUSPENSE":
+                            case "CREDIT_CARD_SUSPENSE":
+                                $expData = array("id" => $id, "PaidOn" => $paidDate, "Amount" => $amount, "ExpenseType" => $catKey["key"]);
+
+                                update_trial_balance("expense", $expData, "BANK", $tType);
+                                break;
+
+                            case "SALARY":
+                                $saldata = array("id" => $id, "PaidDate" => $paidDate, "GrossSalary" => $amount);
+                                update_trial_balance("salary", $saldata, "BANK", $tType);
+                                break;
+
+                            case "PAYEE_CONTROL":
+                                $paydata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                update_trial_balance("payee", $paydata, "BANK", $tType);
+                                break;
+
+                            case "VAT_CONTROL":
+                                $vatdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                update_trial_balance("vat", $vatdata, "BANK", $tType);
+                                break;
+
+                            case "DIVIDEND":
+                                $divdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                update_trial_balance("dividend", $divdata, "BANK", $tType);
+                                break;
+
+                            default:
+
+                                $user = $this->session->userdata('user');
+                                if (isset($user["AccountantAccess"]) && !empty($user["AccountantAccess"])) {
+                                    $aAccess = $user["AccountantAccess"];
+                                } else {
+                                    $aAccess = $user["UserID"];
+                                }
+                                $tbSource = "BANK"; // Used for TB Details no relation to Any other variable used Above
+
+                                if ($tType == "MONEY_IN") {
+                                    // "Cash at bank" goes down by "Total amount"
+                                    $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                    $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                    if ((int) $TBentryId > 0) {
+                                        add_trial_details($TBCatId, $paidDate, $tbSource, "CASH_AT_BANK", $aAccess, $id, $amount, "3");
+                                    }
+
+                                    // "Same category" goes up by "Total amount" 
+                                    $TBCatId = get_trial_balance_category($catKey["key"]); //get category ID for given key
+                                    if ($TBCatId) {
+                                        $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                        if ((int) $TBentryId > 0) {
+                                            add_trial_details($TBCatId, $paidDate, $tbSource, $catKey["key"], $aAccess, $id, $amount, "3", "SUBTRACT");
+                                        }
+                                    }
+                                } else if ($tType == "MONEY_OUT") {
+
+                                    // "Cash at bank" goes down by "Total amount"
+                                    $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                    $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                    if ((int) $TBentryId > 0) {
+                                        add_trial_details($TBCatId, $paidDate, $tbSource, "CASH_AT_BANK", $aAccess, $id, $amount, "3", "SUBTRACT");
+                                    }
+
+                                    // "Same category" goes up by "Total amount" 
+                                    $TBCatId = get_trial_balance_category($catKey["key"]); //get category ID for given key
+                                    if ($TBCatId) {
+                                        $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                        if ((int) $TBentryId > 0) {
+                                            add_trial_details($TBCatId, $paidDate, $tbSource, $catKey["key"], $aAccess, $id, $amount, "3");
+                                        }
+                                    }
+                                }
+
+                                break;
+                        }
+                    }
+                }
+
+
+
+                if (!$response) {
+                    $msg = '<div class="alert alert-danger">';
+                    $msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;';
+                    $msg .= $this->lang->line('UNEXPECTED_ERROR_OCCURED');
+                    $msg .= '</div>';
+                    $this->session->set_flashdata('bankError', $msg);
+                    $response1['success'] = false;
+                    $response1['error_msg'] = $msg;
+                    $response1['url'] = site_url('bank_statements');
+                    echo json_encode($response1);
+                    die;
+                } else {
+
+                    /* Added for P/L & B/S entries */
+                    if ($delDetails) {
+                        foreach ($delDetails as $SEntry) {
+                            if (!empty($SEntry["key"])) {
+
+                                if (!empty($SEntry["MoneyOut"])) {
+                                    $amount = $SEntry["MoneyOut"];
+                                    $tType = "MONEY_OUT";
+                                } else if (!empty($SEntry["MoneyIn"])) {
+                                    $amount = $SEntry["MoneyIn"];
+                                    $tType = "MONEY_IN";
+                                } else {
+                                    $amount = 0;
+                                    $tType = "MONEY_IN";
+                                }
+                                $paidDate = $SEntry["TransactionDate"];
+                                $id = $SEntry["id"];
+                                switch ($SEntry["key"]) {
+
+                                    case "SALES":
+                                        $invData = array("id" => $id, "PaidOn" => $paidDate, "InvoiceTotal" => $amount);
+                                        update_trial_balance("invoice", $invData, "BANK_DEL", $tType);
+                                        break;
+
+                                    case "EXPENSE_SUSPENSE":
+                                    case "CREDIT_CARD_SUSPENSE":
+                                        $expData = array("id" => $id, "PaidOn" => $paidDate, "Amount" => $amount, "ExpenseType" => $SEntry["key"]);
+                                        update_trial_balance("expense", $expData, "BANK_DEL", $tType);
+                                        break;
+
+                                    case "SALARY":
+                                        $saldata = array("id" => $id, "PaidDate" => $paidDate, "GrossSalary" => $amount);
+                                        update_trial_balance("salary", $saldata, "BANK_DEL", $tType);
+                                        break;
+
+                                    case "PAYEE_CONTROL":
+                                        $paydata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                        update_trial_balance("payee", $paydata, "BANK_DEL", $tType);
+                                        break;
+
+                                    case "VAT_CONTROL":
+                                        $vatdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                        update_trial_balance("vat", $vatdata, "BANK_DEL", $tType);
+                                        break;
+
+                                    case "DIVIDEND":
+                                        $divdata = array("id" => $id, "PaidDate" => $paidDate, "Total" => $amount);
+                                        update_trial_balance("dividend", $divdata, "BANK_DEL", $tType);
+                                        break;
+
+                                    default:
+
+                                        $user = $this->session->userdata('user');
+                                        if (isset($user["AccountantAccess"]) && !empty($user["AccountantAccess"])) {
+                                            $aAccess = $user["AccountantAccess"];
+                                        } else {
+                                            $aAccess = $user["UserID"];
+                                        }
+                                        $tbSource = "BANK"; // Used for TB Details no relation to Any other variable used Above 
+
+                                        if ($tType == "MONEY_IN") {
+                                            // "Cash at bank" goes down by "Total amount"
+                                            $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                            $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                            if ((int) $TBentryId > 0) {
+                                                rm_trial_details($tbSource, "CASH_AT_BANK", $id);
+                                            }
+
+                                            // "Same category" goes up by "Total amount" 
+                                            $TBCatId = get_trial_balance_category($SEntry["key"]); //get category ID for given key
+                                            if ($TBCatId) {
+                                                $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                                if ((int) $TBentryId > 0) {
+                                                    rm_trial_details($tbSource, $SEntry["key"], $id);
+                                                }
+                                            }
+                                        } else if ($tType == "MONEY_OUT") {
+                                            // "Cash at bank" goes down by "Total amount"
+                                            $TBCatId = get_trial_balance_category("CASH_AT_BANK"); //get category ID for given key
+                                            $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount);
+                                            if ((int) $TBentryId > 0) {
+                                                rm_trial_details($tbSource, "CASH_AT_BANK", $id);
+                                            }
+
+                                            // "Same category" goes up by "Total amount" 
+                                            $TBCatId = get_trial_balance_category($SEntry["key"]); //get category ID for given key
+                                            if ($TBCatId) {
+                                                $TBentryId = store_trial_entry($TBCatId, $paidDate, $amount, "SUBTRACT");
+                                                if ((int) $TBentryId > 0) {
+                                                    rm_trial_details($tbSource, $SEntry["key"], $id);
+                                                }
+                                            }
+                                        }
+
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    /* Added for P/L & B/S entries */
+
+                    $msg = '<div class="alert alert-success">';
+                    $msg .= '<i class="glyphicon glyphicon-ok"></i>';
+                    $msg .= $this->lang->line('BANK_STATEMENT_DELETE_SUCCESS');
+                    $msg .= '</div>';
+                    $this->session->set_flashdata('bankError', $msg);
+                    setRedirect('bank_statements');
+                }
+            }
+        } else {
+            show_404();
+        }
+    }
+
+    public function bank_sort() {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $order = safe($this->encrypt->decode($_POST['order']));
+            $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
+
+            $des_order_value = array(
+                'SORT_BY_CATEGORY' => 's.Category DESC'
+            );
+            $asc_order_value = array(
+                'SORT_BY_CATEGORY' => 's.Category ASC'
+            );
+            $prev_order = $this->session->userdata('BankSortingOrder');
+            $dir = '';
+            if (!empty($prev_order)) {
+                $order_value = $des_order_value[$order];
+                if ($order_value == $prev_order) {
+                    $order_value = $asc_order_value[$order];
+                    $dir = 'fa-sort-up';
+                } else {
+                    $order_value = $des_order_value[$order];
+                    $dir = 'fa-sort-desc';
+                }
+            } else {
+                $order_value = $des_order_value[$order];
+            }
+            $this->session->set_userdata('BankSortingOrder', $order_value);
+            $data['items'] = $this->bank->getItems(BANK_PAGINATION_LIMIT, $page);
+            $data['current_balance'] = $this->bank->get_current_balance();
+            $data['current_balance'] = $data['current_balance']['Balance'];
+            $json['html'] = $this->load->view('client/banks/bank_listing', $data, true);
+            $json['dir'] = $dir;
+            echo json_encode($json);
+            exit;
+        } else {
+            show_404();
+        }
+    }
+
+    public function getStatementById() {
+        $_SESSION['bank_statements'] = '';
+        $_SESSION['bankId'] = '';
+        $this->session->set_userdata('temp_statement_record', '');
+        $page = 0;
+        $bankId = $this->input->post('bankId');
+        $data['items'] = $this->bank->getItems(BANK_PAGINATION_LIMIT, $page, '', $bankId);
+        $data['current_balance'] = $this->bank->get_current_balance();
+        $data['current_balance'] = $data['current_balance']['Balance'];
+        $total = $this->bank->totalEntries();
+        $data['pagination'] = $this->getPagination(BANK_PAGINATION_LIMIT, $total);
+        $this->load->view('client/banks/bank_listing', $data);
+    }
+
+    public function saveBank() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+						
+            $user = $this->session->userdata('user');
+            // $access = clientAccess();
+            $data = array(
+                'CompanyID' => $user['CompanyID'],
+                'Name' => $this->input->post('BankName'),
+                'ShortCode' => $this->input->post('ShortCode'),
+                'AccountNumber' => $this->input->post('AccountNumber'),
+                'AddedOn' => date('Y-m-d'),
+                'AddedBy' => $user['UserID'],
+                'Status' => 1,
+            );
+
+            $save = $this->bank->saveBank($data);
+			if ($save) {
+				$msg = '<div class="alert alert-success">';
+				$msg .= '<i class="glyphicon glyphicon-ok"></i>';
+				$msg .= 'Bank Added Successfully .';
+				$msg .= '</div>';
+				$this->session->set_flashdata('bankMessage', $msg);
+				$output['success'] 	= true;
+			} else {
+				$msg = '<div class="alert alert-danger">';
+				$msg .= '<i class="glyphicon glyphicon-exclamation-sign"></i>';
+				$msg .= 'Something error data not inserted.';
+				$msg .= '</div>';
+				$this->session->set_flashdata('bankMessage', $msg);
+				$output['success'] 			= false;
+			}
+			
+			if(isset($_POST['page'])) {											
+				$output['page']    = "uploadstatment";
+				$output['savedata']    = $save;
+				echo json_encode($output);exit;	
+			}else{											
+				$output['page']    = "addstatment";
+				$output['savedata']    = $save;
+				echo json_encode($output);exit;	
+			}
+				
+				
+        } else {
+            show_404();
+        }
+    }
+	
+	/**  Function to Save Edited BankStatment **/
+	public function saveEditdBankStatment() { 
+		$response = $this->bank->update_statementsCategory($_POST['id'],$_POST['catId']); 
+		echo $response;
+	}
+
+}
+
+/* End of file welcome.php */
+/* Location: ./application/controllers/welcome.php */

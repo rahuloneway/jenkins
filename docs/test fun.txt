@@ -1,0 +1,21 @@
+#Just create for geting parent child list from trial balance categories	
+	/*function testFun(){
+		$ci = &get_instance();
+        $prefix = $ci->db->dbprefix;
+		
+		$ci->db->select('*');
+		$query = $ci->db->get_where('cashman_trial_balance_categories', array('parent' => 0));
+		$result = $query->result();
+		
+		foreach($result as $val){
+			echo "<br><strong>".$val->title."</strong>";
+			$ci->db->select('title');
+			$query2 = $ci->db->get_where('cashman_trial_balance_categories', array('parent' => $val->id));
+			$result2 = $query2->result();
+			foreach($result2 as $val2){
+				echo "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$val2->title;
+			}
+			
+		}
+		die('*********');
+	}*/

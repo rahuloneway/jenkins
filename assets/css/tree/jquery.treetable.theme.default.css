@@ -1,0 +1,96 @@
+table.treetable {
+  border-collapse: collapse;
+  font-size: 1em;
+  line-height: 1;
+  padding: 42px 0;
+  width: 100%;
+}
+
+table.treetable caption {
+  font-size: .9em;
+  font-weight: bold;
+  margin-bottom: .2em;
+}
+
+table.treetable thead {
+  background-color: rgb(227, 226, 226);
+  font-size: 1.2em;
+  height: 34px;
+}
+.no-margin{
+  margin:0;
+  padding:0;
+}
+table.treetable thead tr th {
+ 
+  font-weight: normal;
+  padding: .3em 1em .1em 4em;
+  text-align: left;
+}
+
+table.treetable tbody tr td {
+  cursor: default;
+  padding: .3em 5em;
+}
+
+table.treetable span {
+  background-position: center left;
+  background-repeat: no-repeat;
+  padding: .2em 0 .2em 1.5em;
+}
+
+
+
+
+/*
+table.treetable tbody tr:active,table.treetable tbody tr:focus,table.treetable tbody tr:hover{
+  background-color:#3f88cf;
+  color:#fff !important;
+}
+*/
+
+
+table.treetable tr {
+
+  height: 37px;
+}
+
+table.treetable tr.selected {
+  background-color: #3875d7;
+  color: #fff;
+}
+
+table.treetable tr span.indenter a {
+  outline: none; /* Expander shows outline after upgrading to 3.0 (#141) */
+}
+
+table.treetable thead tr th:first-child {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  width: 74%;
+}
+
+
+
+
+
+/***** new add ********/
+
+
+
+
+table.treetable thead tr th{
+ font-weight:bold;
+ text-transform: uppercase;
+ font-size: 18px;
+}
+
+table.treetable thead tr th:not(:first-child) {
+ border-left: 1px solid #d5d5d5;
+ padding: .3em 1em .1em 1em;
+}
+
+table.treetable tbody tr td {
+ padding: .3em 5em .3em 2em;
+}

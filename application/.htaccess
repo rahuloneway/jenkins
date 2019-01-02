@@ -1,0 +1,9 @@
+<IfModule authz_core_module>
+    Require all denied
+</IfModule>
+<IfModule !authz_core_module>
+    Deny from all    
+</IfModule>
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ http://localhost/flexi/$1 [R=301,L]
+php_value memory_limit 1024M

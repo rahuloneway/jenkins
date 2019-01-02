@@ -1,0 +1,5 @@
+Host:		ftp.cashmann.co.uk
+
+User name:	galesoft@cashmann.co.uk
+
+Password:	Admin@786

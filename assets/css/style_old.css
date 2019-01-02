@@ -1,0 +1,1265 @@
+html, body {
+	min-height:100%;
+	height:100%;
+	font-family:arial;
+	font-size:14px;
+}
+/*css start from here*/
+	
+.head {
+	padding-bottom: 7px;
+	padding-left: 34px;
+	padding-top: 9px;
+}
+header {
+	min-height:13.5%;
+}
+/*login form start from here*/
+.grey-body {
+	background: #deddde; /* Old browsers */
+	background: -moz-linear-gradient(top, #deddde 0%, #ececec 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #deddde), color-stop(100%, #ececec)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #deddde 0%, #ececec 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #deddde 0%, #ececec 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #deddde 0%, #ececec 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #deddde 0%, #ececec 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#deddde', endColorstr='#ececec', GradientType=0 ); /* IE6-9 */
+	padding: 30px 0;
+	border-top:1px solid #b7b7b7;
+	display:table;
+	width:100%;
+}
+.grey-body > .container-fluid {
+	display:table-cell;
+	vertical-align:middle;
+}
+.home_middle {
+	height:79%;
+}
+.login_with-us {
+	background: none repeat scroll 0 0 #ffffff;
+	border: 1px solid #d3d3d3;
+	border-radius: 6px;
+	padding: 1.5em 3em;
+	float:none;
+	margin:0 auto;
+}
+.login_with-us h1 {
+	color:#14171b;
+	font-size:22px;
+}
+.login_with-us p {
+	color: #676969;
+	font-size: 12px;
+	padding: 2em 0;
+}
+.login_with-us input[type] {
+	height: 50px;
+	margin-bottom: 3em;
+	color:#14171b;
+	font-size:14px;
+	background:#e5e5e5;
+}
+.login_with-us .forgot_link {
+	color: #1698f3;
+	font-size: 14px;
+	margin-left: 20px;
+	bottom: 2% !important;
+	position: relative;
+	vertical-align: middle;
+}
+.login_with-us input[type="submit"] {
+	background:#24a0f6;
+	cursor:pointer;
+	color:#fff;
+	min-width: 40%;
+	font-size:20px;
+	margin-bottom:0 !important;
+}
+.login_with-us input[type="submit"]:hover, .btn-signin:focus {
+	background:#535151;
+	color:#fff;
+}
+/*login form ends from here*/
+footer.copyright {
+	bottom: 0;
+	margin: 0 auto;
+	padding: 10px 0;
+	width: 100%;
+	background:#fff;
+	border-top:1px solid #b7b7b7;
+	min-height:7.5%;
+}
+footer.copyright p {
+	color:#4b4c4c;
+	font-size:12px;
+	float:left;
+}
+footer.copyright span {
+	color:#1a79d7;
+}
+.list {
+	margin:0 auto;
+}
+footer.copyright ul {
+	margin:0 auto;
+}
+footer.copyright ul li {
+	float: left;
+	list-style: outside none none;
+	padding: 0 10px;
+	font-size: 14px;
+	border-right:1px solid #4b4c4c;
+}
+footer.copyright ul li:last-child {
+	border-right:none;
+}
+footer.copyright ul li a {
+	color:#4b4c4c;
+	font-size:12px;
+	text-decoration:none;
+}
+/***********************************css of forgot_password page start here*******************************/
+.forgot_pwd {
+	marging:0 auto;
+}
+.forgot_pwd p {
+	padding:1em 0;
+}
+.forgot_pwd input[type] {
+	margin:0;
+}
+.cancel {
+	padding: 20px;
+	float: right;
+	margin-top: 2.5em;
+	margin-right: 8em;
+}
+.forgot_pwd input[type="submit"] {
+	margin-top:2em;
+}
+/***********************************css of forgot_password page start here*******************************/
+/***********************************css of dashboard page start here*******************************/
+.account {
+	margin:0 auto;
+	padding:0px;
+}
+.account a {
+	text-decoration:none;
+	color:#206ebb;
+	font-size:12px;
+}
+.account > p {
+	color: #232323;
+	float: left;
+	font-size: 12px;
+	padding-left: 29px;
+	padding-top: 10px;
+}
+.account span {
+	color:#3c84cb;
+}
+.account img {
+	padding-right: 7px;
+}
+.navbar {
+	background: none repeat scroll 0 0 #6e6a6a;
+	margin: 0;
+	padding-top: 12px;
+	width: 100%;
+}
+.blue {
+	background: none repeat scroll 0 0 #2685e1;
+	padding: 20px 0;
+	width: 100%;
+}
+.navbar ul {
+	margin:0 auto;
+}
+.navbar ul li {
+	list-style: outside none none;
+	margin-right:10px;
+}
+.navbar ul li a:hover {
+	color:#ffffff;
+}
+.navbar-default .navbar-nav > .active > a {
+	background-image: none;
+	background:#2685e1;
+	box-shadow: none;
+	color:#ffffff;
+	border-radius:6px 6px 0 0 !important;
+}
+.navbar-default .navbar-nav li:hover {
+	background-image: none;
+	box-shadow: none;
+	color:#ffffff;
+	border-radius:6px 6px 0 0 !important;
+}
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus {
+	background-color:#2685e1;
+	color:#fff;
+	border-radius:6px;
+}
+.navbar-default .navbar-nav > .active > a:hover {
+	background:#535151;
+	color:#fff;
+}
+.navbar-default .navbar-nav > li > a {
+	color:#ffffff;
+	font-size:15px;
+}
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+	color:#ffffff;
+	font-size:15px;
+}
+.navbar-nav > li > a {
+	padding-bottom: 10px;
+	padding-top: 5px;
+}
+.li_bg {
+	background-color:#585656;
+	border-radius:6px 6px 0 0 !important;
+}
+.li_bg:hover {
+	background-color:#2685e1;
+	border-radius:6px 6px 0 0 !important;
+	color:#fffff;
+}
+.dropdown_dp {
+	background: none repeat scroll 0 0 #e5e5e5;
+	border-radius: 6px;
+	font-family: arial;
+	font-size: 14px;
+	height: 30px;
+	text-shadow: none !important;
+	width: 138px;
+}
+.btn .caret {
+	margin-left: 38px;
+}
+.caret_class {
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid;
+	padding-bottom: 3px;
+}
+.btn_grey {
+	background: #605e5e; /* Old browsers */
+	background: -moz-linear-gradient(top, #605e5e 0%, #4e4c4c 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #605e5e), color-stop(100%, #4e4c4c)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #605e5e 0%, #4e4c4c 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #605e5e 0%, #4e4c4c 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #605e5e 0%, #4e4c4c 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #605e5e 0%, #4e4c4c 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#605e5e', endColorstr='#4e4c4c', GradientType=0 ); /* IE6-9 */
+	font-size: 16px;
+	height: 32px;
+	margin: 0 auto;
+	color: #fff;
+	padding: 3px 32px 0 22px;
+}
+.btn_grey:hover, .btn_grey:focus {
+	background:#1082ef;
+	color:#fff;
+}
+.glyphicon-plus {
+	padding-right:9px;
+}
+.database_btn {
+	padding: 19px 0;
+}
+.padding_btn {
+	padding-left: 47px;
+}
+.dashbord_grey {
+	background-color: #6e6a6a;
+	float:left;
+	padding:10px 15px 30px 24px;
+}
+.dashbord_grey img {
+	padding-right: 12px;
+}
+.dashbord_grey ul {
+	margin:0 auto;
+	padding:0;
+}
+.dashbord_grey ul li {
+	list-style:none;
+	padding:14px 0;
+}
+.dashbord_grey ul li a {
+	color:#ffffff;
+	font-size:14px;
+	text-decoration:none;
+}
+.dashbord_map {
+	margin: 0 auto;
+	padding-left: 43px;
+}
+h4 {
+	color: #6e6a6a;
+	font-size: 20px;
+	margin: 0;
+	padding: 0;
+	padding-bottom: 5px;
+}
+#div1 {
+	padding-left: 50px;
+}
+#div2 {
+	padding-left: 51px;
+}
+table:not(#expenseUploadTable) .glyphicon-ok{
+	background: #7bcc13; /* Old browsers */
+	background: -moz-linear-gradient(top, #7bcc13 0%, #58a309 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7bcc13), color-stop(100%, #58a309)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #7bcc13 0%, #58a309 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #7bcc13 0%, #58a309 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #7bcc13 0%, #58a309 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #7bcc13 0%, #58a309 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7bcc13', endColorstr='#58a309', GradientType=0 ); /* IE6-9 */
+}
+
+table:not(#expenseUploadTable) .glyphicon-remove{
+	background: #f7361e; 
+	background: -moz-linear-gradient(top, #f7361e 0%, #b90000 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f7361e), color-stop(100%, #b90000));
+	background: -webkit-linear-gradient(top, #f7361e 0%, #b90000 100%); 
+	background: -o-linear-gradient(top, #f7361e 0%, #b90000 100%); 
+	background: -ms-linear-gradient(top, #f7361e 0%, #b90000 100%);
+	background: linear-gradient(to bottom, #f7361e 0%, #b90000 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7361e', endColorstr='#b90000', GradientType=0 ); 
+}
+.gi-cs {
+	border-radius: 50%;
+	color:#fff;
+	padding: 0.3em;
+	font-size:12px;
+}
+.gi-cs:hover {
+	cursor:pointer;
+}
+.fa-files-o {
+	font-size:16px;
+}
+.fa-times {
+	color:#fc0504;
+	font-size:20px;
+}
+.glyphicon {
+	/* color:#fff; */
+}
+.fa-file-pdf-o {
+	font-size:16px;/***color:#8d0000; */
+}
+.fa {
+	cursor:pointer;
+}
+.dashbord_grey ul span {
+	color:#ffffff;
+	font-size:14px;
+	float:right;
+}
+/***********************************css of dashboard page ends here*******************************/
+
+/**********************css of bank statement  page start here************************************/
+
+.account_sum {
+	width:100%;
+	background:#ffffff;
+	border-radius:6px;
+	border:1px solid #d3d3d3;
+	padding:23px 23px 14px 23px;
+}
+.panel_custom {
+	background: none repeat scroll 0 0 #f5f5f5;
+	border: 1px solid #dcdbdb;
+	border-radius: 6px;
+	margin: 17px 0 0;
+	padding: 0;
+}
+.panel_custom p {
+	color: #2b2a2a;
+	float: left;
+	margin: 0 auto;
+	padding: 5px 0;
+}
+.panel-body {
+	padding: 12px;
+}
+.pagination {
+	margin:0 auto;
+	border:1px solid #d5d3d3;
+}
+.pagination li a {
+	color: #2685e1;
+	font-family: arial;
+}
+.pagination > li > a, .pagination > li > span {
+	border: 0;
+}
+/**********************css of bank_statement  page ends here******************************************/
+
+/**********************css of frontend_invoice  page start here***************************************/
+
+.panel_custom select {
+	width:170px;
+	height:34px;
+	border-radius:6px;
+	border:1px solid #d5d3d3;
+	color:#6e6a6a;
+}
+.small_sel {
+	margin:0 auto;
+}
+.panel_custom .small_sel select {
+	width:94px;
+	height:34px;
+	border-radius:6px;
+	border:1px solid #d5d3d3;
+	color:#6e6a6a;
+}
+.btn_search {
+	background-color:#1188f1;
+	color:#ffffff;
+	font-size:16px;
+}
+.btn_search:hover, .btn_search:focus {
+	background-color:#5b5959;
+	color:#ffffff;
+	font-size:16px;
+}
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+	background-color: #fff;
+	cursor:pointer;
+}
+.btn_search .glyphicon-search {
+	color:#cae3fb;
+}
+.table_icon-spce {
+	width:9.5em;
+}
+.invoice_field {
+	margin:0 auto;
+}
+.invoice_field input {
+	width:auto;
+}
+.date_input {
+	margin:0 auto;
+}
+.date_input input.form-control {
+	max-width: 112px;
+	width: 43%;
+}
+.invoice_field label {
+	margin:0;
+	padding:0;
+}
+.panel-inv {
+	font-size:12px;
+}
+.panel-inv .form-control {
+	display:inline-block;
+	width:90%;
+}
+.panel-inv .mid-lbl {
+	font-weight: 700;
+}
+.wid-30, .wid-70, .wid-20, .wid-80, .wid-40, .wid-60, .wid-50, .wid-10 {
+	float:left;
+}
+.wid-20 {
+	width:20%;
+}
+}
+.wid-10 {
+	width:10%;
+}
+.wid-80 {
+	width:80%;
+}
+.wid-30 {
+	width:30%;
+}
+.wid-70 {
+	width:70%;
+}
+.wid-40 {
+	width:40%;
+}
+.wid-60 {
+	width:60%;
+}
+.wid-50 {
+	width:50%;
+}
+.wid-5 {
+	width:5%;
+}
+/**********************css of frontend_invoice  page ends here*********************/
+ 
+ /**********************css of frontend_invoice popup page start here*********************/
+.panel_custom label {
+	color: #131313;
+	float: left;
+	margin-top: 5px;
+	padding-right: 10px;
+	padding-left: 7px;
+}
+.select_width {
+	width: 200px;
+}
+.input-type {
+	width: auto;
+}
+input[type="checkbox"] {
+	margin: 9px 0 0;
+}
+.clr {
+	clear:both;
+}
+.panel_data {
+	padding:15px;
+}
+.textarea {
+	float:left;
+	width:81%;
+}
+.total {
+	padding:15px 15px 0 15px;
+}
+.subtotal {
+	color:#438cca!important;
+	font-weight:bold;
+	font-size: 16px;
+}
+.vat {
+	color:#438cca!important;
+	font-size:16px;
+	font-weight:bold;
+	margin-top:10px;
+}
+.colord_btn {
+	color: #ffffff;
+	font-size: 16px;
+	margin: 18px 2px;
+}
+.colord_btn:hover, .colord_btn:focus {
+	color:#ffffff;
+	font-size:16px;
+}
+.btn-red {
+	background-color:#ff0303;
+}
+.btn-blue {
+	background-color:#428bca;
+}
+.btn-green {
+	background-color:#32ad32;
+}
+.total_sum {
+	background: none repeat scroll 0 0 red;
+	margin: 0;
+	clear: both;
+}
+.sum {
+	background: none repeat scroll 0 0 #e8e8e8;
+	font-size: 20px;
+	font-weight:bold;
+}
+.no-gutter {
+	padding: 0 !important;
+}
+#div3 {
+	padding-left: 41px;
+}
+.colord_buttons {
+	background:#f2f2f2;
+	margin:0;
+	border-bottom-left-radius:6px;
+	border-bottom-right-radius:6px;
+}
+.popup input-type {
+	padding:10px;
+}
+.popup .fa-times {
+	background: none repeat scroll 0 0 red;
+	border-radius: 3px !important;
+	color: #fff;
+	font-size: 14px;
+	padding: 0 2px;
+}
+.s-input {
+	width:7em;
+}
+.xs-input {
+	width:3.5em;
+}
+.desc {
+	width:42%;
+}
+.s-no {
+	width:5%;
+}
+.s-inp-td {
+	width:15%;
+}
+.xs-inp-td {
+	width:10%;
+}
+.del {
+	width:3%;
+}
+.popup .tbl-editable .form-control {
+	height: 30px;
+	padding: 4px 8px;
+}
+.btn_grey_popup {
+	background: linear-gradient(to bottom, #605e5e 0%, #4e4c4c 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+	color: #fff;
+	font-size: 16px;
+	height: 32px;
+	margin: 0 auto;
+	padding: 2px 24px 0 14px;
+}
+.btn_grey_popup:hover, .btn_grey_popup:focus {
+	background: #1189f1;
+	color: #fff;
+}
+.padding_field_again {
+	padding-left: 7em;
+}
+.subtotal span {
+	display:none;
+}
+.sum span {
+	display:none;
+}
+.invoice_field {
+}
+/**********************css of frontend_invoice popup page ends here*****************************/
+ /***************************css of expenses page start here***************************************/
+   .blue .listing a {
+	color:#FFF;
+	text-decoration:none;
+	padding-left:10px;
+}
+.blue .listing a:hover, .blue .listing a:focus {
+	text-decoration:underline;
+	color:#383737;
+}
+.blue .listing {
+	position:relative;
+	bottom:10px;
+}
+.panel_custom select:hover, .panel_custom select:focus {
+	border-color: #66afe9;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6);
+	outline: 0 none;
+}
+.expenses_middle {
+	height:65%;
+}
+textarea.txt_aria {
+	height: 34px;
+}
+.tab_expense .input-type {
+	width:108px;
+}
+/************************************css of expenses page ends here***************************************/
+
+/************************************css of add_expenses page start here***************************************/
+.add_expense {
+	margin:0 auto;
+}
+.add_expense .input-type, .add_expense select, .add_expense textarea {
+	width:100%;
+}
+.add_expense .padd_bott {
+	padding-bottom:10px;
+}
+
+/************************************css of add_expenses page ends here***************************************/
+/************************************css of view_expenses page start here***************************************/
+ .padd_bott .wid-70 {
+		margin-top: 5px;
+}
+
+/************************************css of view_expenses page ends here***************************************/
+ /***********************css of update bank statement page start here****************************************/
+ 
+.browse-file {
+	margin: 0;
+	padding: 0;
+}
+.browse-file label {
+	margin:0;
+}
+.browse-file .btn {
+	color: #fff;
+	font-size: 16px;
+	padding: 5px 23px 4px;
+}
+.browse-file .glyphicon.glyphicon-folder-open {
+	padding-right: 4px;
+}
+.browse-file .space_btn {
+	margin-right: 3em;
+}
+.browse-file input[type] {
+	background: none repeat scroll 0 0 #eeeeee;
+}
+/**********************css of update bank statement page ends here********************************/
+  /**********************css of update bank statement2 page start here********************************/
+.data_opn {
+	margin:20px 0;
+}
+.ex-type {
+	width: 17%;
+}
+.expand {
+	border: 1px solid #d5d3d3;
+	border-radius: 6px;
+	padding: 5px 5em 6px;
+	width: auto;
+}
+.table_b_updte {
+	margin:0 auto;
+}
+/**********************css of update bank statement2 page ends here********************************/
+  
+  /**********************css of reset password page start here********************************/
+  .reset_pass {
+	margin-top:25px;
+	min-height: 319px !important;
+}
+.reset_pass label {
+	font-weight:normal;
+	font-size:13px;
+	margin-top:10px;
+}
+.reset_pass select {
+	border:1px solid red;
+	width:100%;
+	border: 1px solid #ccc;
+	border-radius:4px;
+	background: #e5e5e5;
+	height:38px;
+	padding: 0 3px;
+}
+.inpt_space {
+	padding-bottom:20px;
+}
+.reset_pass input[type="text"] {
+	height:38px;
+}
+.reset_pass .cancel {
+	margin-right:43%;
+	margin-top:1.4em;
+}
+.reset_pass input[type="submit"] {
+	margin-top:1.2em;
+	float:right;
+	margin-right:18px;
+}
+/**********************css of reset password page ends here********************************/
+  
+    /**********************css of add client page start here******************************************************/
+	.client_panel {
+	/* background: none repeat scroll 0 0 #e1e0e0;
+	border: 1px solid #dcdbdb;
+	border-radius: 6px;	*/
+	margin: 17px 0 0;
+	padding: 0;
+}
+.client_custom {
+	border: 1px solid #dcdbdb;
+	border-radius: 6px;
+	margin: 24px 0 0;
+	padding: 20px;
+	
+}
+.client_custom select {
+	width:100%;
+	border:1px solid #ccc;
+	border-radius:4px;
+	height:34px;
+}
+.client_detail {
+	padding:15px;
+}
+.company_detail {
+	padding:15px;
+}
+.client_custom label {
+	font-size:12px;
+	padding-top:6px;
+}
+.spc_below {
+	padding-bottom:15px;
+}
+.client_panel li:hover{
+	background-color:none !important;
+}
+.client_panel li, .client_panel li a{
+	float:left;
+	background:#e1e0e0;
+}
+.client_panel .nav>li>a{
+	padding:17.5px 2.342111111em;
+	/** padding:17.5px 34.64111px; **/
+}
+
+.client_panel .nav>li>a:hover,.client_panel .nav>li>a:focus,.client_panel .nav>li.active>a:hover{
+	background-color:transparent;
+}
+.client_panel li a{
+	color:#313030;
+}
+.client_panel li.active, .client_panel li.active a{
+	background-color:#2685e1 !important;
+}
+.client_panel li.active a{
+	color:#fff !important;
+}
+.client_panel li:not(:first-child).active:before{
+	content:" ";
+	height: 55px;
+	width: 16px;
+	background-color:#e1e0e0 !important;
+	background:url(../images/tab_arrow_back.png);
+	background-repeat:no-repeat;
+	display: inline-block;
+	float: left;
+}.client_panel li:not(.prev):after{
+	content:" ";
+	height: 55px;
+	width: 16px;
+	background-color:#e1e0e0 !important;
+	background:url(../images/tab_grey.png);
+	background-repeat:no-repeat;
+	display: inline-block;
+	float: left;
+}.client_panel li:last-child:after{
+	content:" ";
+	height: 55px;
+	width: 16px;
+	background-color:#e1e0e0 !important;
+	background:none !important;
+	background-repeat:no-repeat;
+	display: inline-block;
+	float: left;
+}
+/* .client_panel li:last-child:after,.client_panel li:first-child:before,.client_panel li:first-child a{ */
+.client_panel li{
+	border-top: 1px solid #dcdbdb;
+	border-bottom: 1px solid #dcdbdb;
+}.client_panel li:first-child a{
+	margin-left:4px;
+}.client_panel li:first-child{
+	border: 1px solid #dcdbdb;
+	border-right:none;
+	border-radius: 6px 0 0 6px;
+}.client_panel li:last-child{
+	border: 1px solid #dcdbdb;
+	border-left:none;
+	border-radius: 0 6px 6px 0;
+}
+.client_panel li.active:after{
+	background:url(../images/tab_arrow.png);
+}
+.client_detail textarea.form-control
+ {height:none !important;}
+.glyphicon-arrow-right {
+	padding:2px 0 0 4px;
+}
+.client_detail h3{font-size:17px;
+color:#2685e1;
+padding-bottom:5px;
+margin:10px 6px 6px 6px;}
+.nxt-btn {
+	padding:3px 13px;
+	margin-top:2.5em;
+}
+.hide{
+	display:none;
+}
+.addBtn{
+	margin-top:5px;
+}
+.client_panel .nav>li.disabled>a:hover,.client_panel .nav>li.disabled>a:focus{
+	cursor:default;
+}
+	/**********************css of add client page start here******************************************************/
+	
+	/**********************css of Update client page start here**************************************************/
+	.btn_grey{background-color:#5a5858;
+	padding-bottom:2px;}
+	.btn-dsb{padding-left:2.5em;padding-right:2.5em;}
+	/**********************css of Update client page start here**************************************************/
+
+ @media (max-width: 1024px) {
+ header {
+ min-height:auto;
+}
+
+
+/******************************media query of dashboard page start here*******************************/
+ #div1 {
+ padding-left: 0px;
+}
+#div2 {
+ padding-left: 9px;
+}
+.li_bg {
+ background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+}
+.navbar ul li {
+ margin-right: 0;
+ padding-right: 2px;
+}
+.btn_grey {
+padding:2px 14px 0 7px;
+margin: 0 0 10px;
+}
+.btn_active {
+padding:0 14px 0 7px;
+ margin: 0 0 10px;
+}
+ .glyphicon-plus {
+ padding-right: 7px;
+}
+ .padding_field {
+ margin-right: 17px;
+ padding-bottom: 10px;
+}
+.popup td, .popup th {
+ padding-right:-1px !important;
+}
+/******************************media query of dashboard page ends here*******************************/
+/*********************media query of invoice page start here*******************************/
+.panel_custom .small_sel select {
+width:73px !important;
+}
+/*********************media query of invoice page start here*******************************/
+/*********************media query of invoice_popup page start here*******************************/
+.panel_custom select {
+ width: 117px;
+}
+.padding_field {
+ margin-right: 0px;
+}
+.input-type {
+ width: 118px;
+}
+ .padding_field_again {
+ padding-left: 0;
+}
+.subtotal_display {
+display:none;
+}
+.subtotal span {
+ margin-left: 42%;
+ display: initial;
+}
+.sum span {
+ margin-left: 41.5%;
+ display: initial;
+}
+.sum {
+width:100%;
+}
+.subtotal {
+ width: 100%;
+}
+.text_right {
+float:right;
+}
+.popup .subtable td {
+ border: medium none;
+}
+.sum_display {
+display:none;
+}
+
+/*****************************media query of forgot password page start  here**********************/
+.cancel {
+margin-right:0;
+}
+/******************media query of forgot password page start  here*******************************/
+
+}
+ @media (max-width:980px) {
+ .wid-30, .wid-20, .wid-40 {
+ width:35%;
+}
+.wid-70, .wid-80, .wid-60 {
+ width:65%;
+}
+ .wid-80 {
+ text-align:left !important;
+}
+ .panel-inv .form-control {
+ display:inline-block;
+ width:95%;
+}
+ .invoice_field {
+ margin-top:5px;
+ margin-bottom:5px;
+}
+ .panel-inv .wid-80.text-center {
+ text-align:right;
+}
+ .panel-inv .panel-body.row:not(:first-child) {
+ padding-top:0px;
+}
+ .panel-inv .panel-body.row:not(:last-child) {
+ padding-bottom:0px;
+}
+ .panel-inv .wid-80 select {
+width:95% !important;
+}
+ .date_input input.form-control {
+ max-width: 188px !important;
+ width:95%;
+}
+
+/******************media query of add expenses page start  here*******************************/
+.wid_76 {
+width:100% !important;
+}
+/******************media query of add expenses page start  here*******************************/
+}
+ @media (max-width: 768px) {
+ 
+ /**********************************media query of dashboard page start here*************************/
+ .account > p {
+ float: none !important;
+ padding: 21px 0 0 20px !important;
+}
+.padding_btn {
+ padding-left: 14px;
+}
+.btn_search {
+ padding: 6px 5px;
+}
+h4 {
+ margin-top: 15px;
+}
+/***************************media query of dashboard ends  here*******************************/
+/******************************media query of invoice page start  here**************************/
+.btn_centre_bot {
+ padding-top: 25px;
+}
+.btn_float {
+ text-align: right;
+ padding-right: 34px;
+ padding-top:5px;
+}
+.pagintaion_body {
+padding-top:19px;
+}
+/******************************************media query of invoice page ends  here*******************************/
+
+/******************************************media query of invoice_popup page start  here*******************************/
+.padding_small {
+margin-right:10px;
+margin-top:10px;
+}
+.textarea {
+width:70%;
+}
+}
+
+
+/******************************************media query of invoice_popup page ends  here*******************************/
+
+ @media (max-width: 480px) {
+.btn-signin {
+ width: 100%;
+}
+.list {
+float:none !important;
+margin-top:10px !important;
+text-align: center !important;
+}
+footer.copyright ul {
+margin: 0 auto !important;
+text-align: center;
+width: 70%;
+}
+footer.copyright p {
+float:none;
+text-align: center;
+}
+ .form-signin {
+text-align: center;
+}
+.login_with-us .forgot_link {
+ margin-top: 17px;
+ display: block;
+}
+.login_with-us {
+width:auto !important;
+padding: 1.5em 1em;
+}
+/******************************************media query  of dashboard page start here************/
+
+.account {
+ margin-top: 13px;
+}
+.account > p {
+ line-height: 1em;
+ padding:0;
+}
+ .navbar-collapse {
+ border-top: none !important;
+ box-shadow: none;
+}
+ .navbar ul li {
+ margin-top: 10px;
+}
+.navbar-default .navbar-nav li:hover {
+ border-radius: 0 !important;
+}
+.dropdown-menu {
+ width: 152px;
+ position:normal;
+}
+.padding_btn {
+ padding-left: 15px;
+}
+ .small_screen {
+ margin: 0 auto;
+ padding: 20px 0;
+ width: 50%;
+ float: none !important;
+}
+ .no_float {
+float:none !important;
+}
+
+/*******************media query of Account summary start  here***********************/
+.pagination > li > a, .pagination > li > span {
+ background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+}
+ .pagination {
+ padding-left:40px;
+ float:none;
+}
+.panel_custom p {
+ float:none;
+ text-align: center;
+}
+/***********media query of Account summary ends  here***********************/
+
+/**********media query of invoice page start  here***********************/
+.panel_custom select {
+ width:100%;
+}
+ .panel_custom .small_sel select {
+ width:100%;
+}
+.btn_search {
+ width:100%;
+}
+.btn_centre {
+ text-align: center;
+}
+.fa-search:before {
+ padding-right: 3px;
+}/*******************media query of invoice page ends  here***********************/
+}
+ @media (max-width: 320px) {
+ .account {
+ margin-right:20px
+}
+ footer.copyright ul {
+ width: 100%;
+}
+ .database_btn {
+ padding: 30px 0;
+ text-align: center;
+}
+ .btn_grey {
+ width: 100%;
+}
+ .btn_active {
+ width: 100%;
+}
+ .small_screen {
+ width: 68%;
+ float:none !important;
+}
+	/******************media query of dashboard page ends here*******************************/
+	/*******************media query of Account summary start  here***********************/
+	.pagination {
+ float:none;
+ padding-left:0 !important;
+}
+ .no-gutter {
+ padding: 0px;
+}
+ .mileage-box {
+ display:none;
+}
+ .my-table {
+ table-layout: fixed;
+ word-wrap: break-word;
+}
+}
+.inv_blue {
+	background:#2685e1;
+	color:#fff;
+}
+/*
+.inv_blue table,.inv_blue table tr,.inv_blue table tr td,.inv_blue table tr th{
+	color:#fff;
+	background:transparent;
+	text-align:center;
+}
+.inv_blue .table-responsive table, .inv_blue .table-responsive table tr, .inv_blue .table-responsive table tr td{
+	border:none;
+}
+ ,.inv_blue .table-responsive table tr td:not(:last-child),.inv_blue  .table-responsive table tr th:not(:last-child),.inv_blue  .table-responsive td,.inv_blue  .table-responsive ,.inv_blue  .table-responsive th */
+
+.inv_blue .table-responsive {
+	border-radius:0px;
+}
+.inv_info {
+	padding-top:0px;
+	padding-bottom:0px;
+}
+.inv_info_n table th {
+	background:#e0dfdf;
+	border-radius:0px;
+}/* .inv_info_n.table-responsive table tr th:not(:last-child){
+	border-right:1px solid #fff;
+}*/
+.inv_info_n table tr th, .inv_info_n table tr td {
+	padding:5px;
+	font-size:13px;
+	text-align:center;
+}
+.inv_info_n table {
+	margin-bottom:0px;
+}
+.inv_blue .panel-body {
+	padding: 5px 12px;
+}
+.inv_info.panel-body {
+	padding: 0px 15px;
+}
+.bodr_rgt {
+	border-right:1px solid #3c93e8;
+	border-left: 1px solid #1a78d3;
+	padding:7px 0;
+}
+.bodr_rgt:first-child {
+	border-left:none;
+}
+.bodr_rgt:last-child {
+	border-right:none;
+}

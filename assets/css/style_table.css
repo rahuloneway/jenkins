@@ -1,0 +1,208 @@
+
+/* 
+Generic Styling, for Desktops/Laptops 
+*/
+.table-responsive table {
+ 
+		border-collapse: collapse;
+		font-family:arial;
+		width: 100%;
+		font-size:14px;
+		-moz-border-radius:10px;
+		-webkit-border-radius:10px;
+		border-radius:10px
+		}
+
+
+.table-responsive table a {
+	  color: #2685e1;
+	  text-decoration: none !important;
+	}
+	.table-responsive #client-listing a {
+    color: #2685e1;
+}
+	
+/* Zebra striping */
+.table-responsive tr:nth-of-type(even),thead tr{ 
+	
+}
+ .table-responsive th { 
+	font-weight:bold; 
+	background:#ffffff;
+	
+		
+}
+.table-responsive td, th {
+  border-bottom: 1px solid #d9d9d9;
+  color: #131313;
+  font-size: 14px;
+  padding:2px 4px;
+}
+
+.table-responsive table tr td,{
+		padding: 1em ;
+		background-color:#ffffff;
+}
+.table-responsive table tr td:not(:last-child),.table-responsive table tr th:not(:last-child){
+	border-right:1px solid #d9d9d9;
+}
+
+.table-responsive {
+	border:1px solid #e0e0e0;
+	border-radius:6px;
+	margin-top: 14px;
+
+}
+
+ .table-responsive .centre_icon {
+  text-align: center;
+}
+
+
+/*****************table2 start here *********************************************/
+.popup table {
+ 
+		border-collapse: collapse;
+		font-family:arial;
+		width: 100%;
+		font-size:14px;
+		-moz-border-radius:10px;
+		-webkit-border-radius:10px;
+		border-radius:10px
+		}
+
+.popup{
+  margin: 0 auto;
+  margin-top: 18px;
+  border:1px solid #cbc9c9;
+	border-radius:6px;
+}
+.popup thead{ background:#e6e6e6;
+border-top-left-radius:6px;
+border-top-right-radius:6px;}
+.popup tbody tr{
+	border-bottom:1px solid #e1e1e1;
+}
+.popup tr:nth-of-type(even){ 
+	background: #f2f2f2; 
+}
+.popup tr:not(:last-child):after
+{
+    background:red !important;
+}
+
+.popup td,.popup th {
+	color: #131313;
+}
+.popup th {
+	padding: 10px;
+}
+
+.popup .subtable{width:100%;
+padding:0;}
+.popup .subtable tr{border:none !important;
+background:#FFF;}
+
+.popup .subtable td {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.table_b_updte th, td {
+	/* padding: 6px 18px ; */
+	padding: 2px 10px ;
+}
+.table-responsive select {
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  padding:0 6px;
+  color:#777777;
+}
+.tab_expense{width:100%;}
+.tab_expense td ,.tab_expense th{text-align:center;}
+
+/********************************** table in dividend popup2 *******************************************/
+.dividend_table  th{background-color:#f2f2f2;}
+.dividend_table tr:nth-child(even) { /*(even) or (2n 0)*/
+	background: #e6e6e6;
+}
+.dividend_table tr:nth-child(odd) { /*(odd) or (2n 1)*/
+	
+	background: #fff;
+}
+
+
+/********************************** table in dividend popup2 *******************************************/
+	
+	
+	
+
+/* 
+	Max width before this PARTICULAR table gets nasty
+	This query will take effect for any screen smaller than 760px
+	and also iPads specifically.
+	*/
+@media  only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px)  {
+	
+	/* Force table to not be like tables anymore */
+	 .table-responsive  table, .table-responsive thead,.table-responsive  tbody,.table-responsive  th,.table-responsive td, .table-responsive tr { 
+		display: block; 
+		
+	}
+
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+
+	tr { border: 1px solid #ccc; }
+
+
+	.table-responsive table tr td:not(:last-child),.table-responsive table tr th:not(:last-child){
+		border-right:0px !important;
+		}
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+	}
+
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 0px;
+		width: 45%;
+		padding-left:5px;
+	}
+	table {
+  border: 1px solid #e0e0e0;
+     -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px
+}
+
+
+
+	td:before {content: attr(data-title); }
+	
+	.table-responsive table tr td,.table-responsive table tr th {
+		padding: 1em 0 1em 50%;
+	}
+	.table-responsive ,thead,tr{
+	border:0px;
+	
+}
+.popup {border:none;}
+.tab_expense select,.tab_expense input,.tab_expense textarea{width:2% !important;}
+}
+#client-listing tr:nth-child(even),.table-responsive table tr:nth-child(even),.table.dashbord_table tr:nth-child(even)
+{
+  background:#f4f2f2;
+}
+
+		

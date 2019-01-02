@@ -1,0 +1,350 @@
+New Apis Pending
+Invoice copy,delete
+
+// Request for login
+// request-type => get , parameter => uname, password
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/login/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/login/uname/$1/password/$2/deviceId/$3'
+
+ Done
+
+// Request for logout
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/logout/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/logout/API-KEY/$1'
+
+
+
+// Request for dashboard
+// request-type => get , parameter => companyId,deviceId,API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dashboard/
+
+http://cashmann.co.uk/flexi/uat/api/Clientapi/dashboard/companyId/$1/deviceId/$2/API-KEY/$3
+http://cashmann.co.uk/flexi/uat/api/Clientapi/dashboard/216/123/04oggks8w08sg4ggc48wgcgs8s84o0g8k4wocwo4
+
+ Done
+
+// Request for all invoices data for current Client, ** 5 invoices per request
+// request-type => get , parameter => API-KEY , page
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoices/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoices/page/$1/API-KEY/$2'
+http://cashmann.co.uk/flexi/uat/api/Clientapi/invoices/0/04oggks8w08sg4ggc48wgcgs8s84o0g8k4wocwo4
+
+ Done
+ 
+ 
+
+// Request for single invoice item
+// request-type => get , parameter => API-KEY , itemId
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoice/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoice/itemId/$1/API-KEY/$2'
+http://cashmann.co.uk/flexi/api/Clientapi/invoice/itemId/258/API-KEY/k8skc8koo4ckokg0o0sk8sc0wkw4o0gks48s4o0o
+Done
+
+// Request for invoice item pdf, **only for paid and created invoice, Check at your level
+// request-type => get , parameter => API-KEY , itemId
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoicePdf/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoicePdf/itemId/$1/API-KEY/$2'
+http://cashmann.co.uk/flexi/uat/api/Clientapi/invoicePdf/204/04oggks8w08sg4ggc48wgcgs8s84o0g8k4wocwo4
+
+Done
+
+// Request for User List for client, used in invoice add/update
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoiceUserList/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoiceUserList/API-KEY/$1'
+
+Done
+
+// Request for User Detail for client, used in invoice add/update
+// request-type => get , parameter => API-KEY , userId
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoiceUserDetail/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoiceUserDetail/userId/$1/API-KEY/$2'
+http://cashmann.co.uk/flexi/uat/api/Clientapi/invoiceUserDetail/5/04oggks8w08sg4ggc48wgcgs8s84o0g8k4wocwo4
+
+Done
+
+// Request to add invoice
+/**
+ * request-type => post ,
+ * parameter =>
+ * API-KEY ,
+ * Data("< Customer ID >|< Due Date >|< Invoice Date >|< Bank Detail >|< Customer Name >|< Customer Address >|< Invoice Type >|< Task >") ,
+ * /**Customer ID = int<value customer id>, 0 if new customer, Due Date = date<Due Date>, Invoice Date = date<Invoice Date>, Bank Detail = 1 => 'on'  || 0 => 'off', Customer Name = <name> if existing ' ', Customer Address = <name> if existing ' ', Invoice Type = 1 => 'invoice' || 2 => 'crn', Task = 1 => 'save' || 2 => 'create' */
+ * Description(< Item 1 >|< Item 2 >|...) ,
+ * Quantity(< Item 1 >|< Item 2 >|...) ,
+ * UnitPrice(< Item 1 >|< Item 2 >|...) ,
+ * Vat(< Item 1 >|< Item 2 >|...)
+ */
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoice/
+
+Done
+
+// Request to update invoice
+/**
+ * request-type => put ,
+ * parameter =>
+ * API-KEY ,
+ * InvoiceID ('< Invoice Id>') ,
+ * Data("< Customer ID >|< Due Date >|< Invoice Date >|< Bank Detail >|< Customer Name >|< Customer Address >|< Invoice Type >|< Task >") ,
+ * /**Customer ID = int<value customer id>, 0 if new customer, Due Date = date<Due Date>, Invoice Date = date<Invoice Date>, Bank Detail = 1 => 'on'  || 0 => 'off', Customer Name = <name> if existing ' ', Customer Address = <name> if existing ' ', Invoice Type = 1 => 'invoice' || 2 => 'crn', Task = 1 => 'update' || 2 => 'create' */
+ * ItemID(< Item 1 ID >|< Item 2 ID >|...) ,
+ * Description(< Item 1 >|< Item 2 >|...) ,
+ * Quantity(< Item 1 >|< Item 2 >|...) ,
+ * UnitPrice(< Item 1 >|< Item 2 >|...) ,
+ * Vat(< Item 1 >|< Item 2 >|...)
+ */
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoice/
+
+Done
+
+// Request for all expenses data for current Client, ** 5 expenses per request
+// request-type => get , parameter => API-KEY , page
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenses/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenses/page/$1/API-KEY/$2'
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenses/0/8oc0s0cg8sk84sowsg8k0cso0gg48g0wscgg8g80
+
+Done
+
+// Request for single expense item
+// request-type => get , parameter => API-KEY , itemId
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expense/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expense/itemId/$1/API-KEY/$2'
+
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expense/1/8oc0s0cg8sk84sowsg8k0cso0gg48g0wscgg8g80
+
+Done 
+
+// Request to add expense
+/**
+ * request-type => post ,
+ * parameter =>
+
+ * API-KEY ,
+ * Data("< Employee ID >|< Expense Type >|< Month >|< Year >|< Paid on Date >|< Task >") ,
+ * /**Employee ID = int< value Employee ID >, Expense Type = < 1 => EXPENSE || 2 => CREDITCARD >, Month = int< 1....12 >, Year = int< Year => 20** >, Paid on Date = date< Paid on Date > ** if task is create  , Task = 1 => 'save' || 2 => 'create' */
+ * /** Only if Expense Item */
+ * ExpenseDate(< Item 1 >|< Item 2 >|...) ,
+ * ExpenseCategory(< Item 1 >|< Item 2 >|...) ,
+ * ExpenseDescription(< Item 1 >|< Item 2 >|...) ,
+ * ExpenseAmount(< Item 1 >|< Item 2 >|...)
+ * ExpenseVat(< Item 1 >|< Item 2 >|...) /** only for client with vat type stand */
+ * /** Only if milage item */
+ * MileageDate(< Item 1 >|< Item 2 >|...) ,
+ * MileageFrom(< Item 1 >|< Item 2 >|...) ,
+ * MileageTo(< Item 1 >|< Item 2 >|...)
+ * MileageMethod(< Item 1 >|< Item 2 >|...) ,** <31 => Bike, 32 => Car , 33 => Bicycle >
+ * MileagePurpose(< Item 1 >|< Item 2 >|...) ,
+ * MileageMiles(< Item 1 >|< Item 2 >|...)
+ */
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expense/
+
+{
+	"Data":"29|1|12|2016||2",
+	"ExpenseDate":"2016-12-27|2016-12-28",
+	"ExpenseCategory":"51|51",
+	"ExpenseDescription":"expense one|expemnse two",
+	"ExpenseAmount":"100|200",
+	"ExpenseVat":"4|5",
+	"MileageDate":"2016-12-28|2016-12-29",
+	"MileageFrom":"milage from first|milage from second",
+	"MileageTo":"milage to first|milage to secind",
+	"MileageMethod":"33|31",
+	"MileagePurpose":"test 1| test 2",
+	"MileageMiles" : "34|35",
+	"API-KEY":"kggsgc8co80c0wsss040444owswkwkc48sog8ow0"
+}
+
+Done
+
+// Request to update expense
+/**
+ * request-type => put ,
+ * parameter =>
+ * API-KEY ,
+ * ExpenseID
+ * Data("< Employee ID >|< Expense Type >|< Month >|< Year >|< Paid on Date >|< Task >") ,
+ * /**Employee ID = int< value Employee ID >, Expense Type = < 1 => EXPENSE || 2 => CREDITCARD >, Month = int< 1....12 >, Year = int< Year => 20** >, Paid on Date = date< Paid on Date > ** if task is create  , Task = 1 => 'save' || 2 => 'create' */
+ * /** Only if Expense Item */
+ * ExpenseId(< Item 1 >|< Item 2 >|...) ,
+ * ExpenseDate(< Item 1 >|< Item 2 >|...) ,
+ * ExpenseCategory(< Item 1 >|< Item 2 >|...) ,
+ * ExpenseDescription(< Item 1 >|< Item 2 >|...) ,
+ * ExpenseAmount(< Item 1 >|< Item 2 >|...)
+ * ExpenseVat(< Item 1 >|< Item 2 >|...) /** only for client with vat type stand */
+ * /** Only if milage item */
+ * MileageId(< Item 1 >|< Item 2 >|...) ,
+ * MileageDate(< Item 1 >|< Item 2 >|...) ,
+ * MileageFrom(< Item 1 >|< Item 2 >|...) ,
+ * MileageTo(< Item 1 >|< Item 2 >|...)
+ * MileageMethod(< Item 1 >|< Item 2 >|...) ,** <31 => Bike, 32 => Car , 33 => Bicycle >
+ * MileagePurpose(< Item 1 >|< Item 2 >|...) ,
+ * MileageMiles(< Item 1 >|< Item 2 >|...)
+ */
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expense/
+
+
+{
+	"Data":"29|1|12|2016||1",
+	"ExpenseID":"11", // it's a expense id
+	"ExpenseId":"11|30", // expense items id but there type is expense
+	"ExpenseDate":"2016-12-25|2016-12-26",
+	"ExpenseCategory":"51|51",
+	"ExpenseDescription":"row one edit|row two edit",
+	"ExpenseAmount":"25|50",
+	"ExpenseVat":"4|8",
+	"MileageId":"31", // expense items id but there type is milage
+	"MileageDate":"2016-12-23",
+	"MileageFrom":"milage from first",
+	"MileageTo":"milage to first",
+	"MileageMethod":"33",
+	"MileagePurpose":"test 2",
+	"MileageMiles" : "32",
+	"API-KEY":"kggsgc8co80c0wsss040444owswkwkc48sog8ow0"
+}
+
+Done
+
+// Request for expense Category List in add Expense
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseCategoryList/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseCategoryList/API-KEY/$1'
+
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseCategoryList/kcc0w4k04844c00ok44gcwc8s4ks0w8w0ko84gsg
+
+Done
+
+// Request for expense Employee List in add Expense
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseEmployeeList/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseEmployeeList/API-KEY/$1'
+http://www.cashmann.co.uk/flexi/api/Clientapi/expenseEmployeeList/kcc0w4k04844c00ok44gcwc8s4ks0w8w0ko84gsg
+Done
+
+// Request for expense Vehicle List in add Expense
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseVehicleList/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseVehicleList/API-KEY/$1'
+
+http://www.cashmann.co.uk/flexi/api/Clientapi/expenseVehicleList/kcc0w4k04844c00ok44gcwc8s4ks0w8w0ko84gsg
+
+Done
+
+// Request for expense Miles in add Expense
+// request-type => get , parameter => API-KEY , userId , date
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseMiles/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseMiles/userId/$1/year/$2/API-KEY/$3'
+
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseMiles/29/2016-04-06/kcc0w4k04844c00ok44gcwc8s4ks0w8w0ko84gsg
+
+Done
+
+// Request for expense Employee Vat Type
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseVatType/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseVatType/API-KEY/$1'
+
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseVatType/kcc0w4k04844c00ok44gcwc8s4ks0w8w0ko84gsg
+
+Done
+
+// Request for expense Calculating Mileage
+// request-type => get , parameter => API-KEY, vehicleType = <31 => Bike, 32 => Car , 33 => Bicycle >, miles, previousMiles = <in case of car only>
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseCalMileage/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseCalMileage/vehicleType/$1/miles/$2/previousMiles/$3/API-KEY/$4'
+
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/expenseCalMileage/32/110/10/kcc0w4k04844c00ok44gcwc8s4ks0w8w0ko84gsg
+
+Done
+
+// Request for all dividends data for current Client, ** 5 dividends per request
+// request-type => get , parameter => API-KEY , page
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividends/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividends/page/$1/API-KEY/$2'
+
+
+
+// Request for single dividend item
+// request-type => get , parameter => API-KEY , itemId
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividend/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividend/itemId/$1/API-KEY/$2'
+
+
+
+// Request for dividend item pdf, **only for paid dividend, Check at your level
+// request-type => get , parameter => API-KEY , itemId
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendPdf/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendPdf/itemId/$1/API-KEY/$2'
+
+
+
+// Request to add dividend
+/**
+ * request-type => post ,
+ * parameter =>
+ * API-KEY ,
+ * Data("< ShareHolder ID >|< Dividend Date >|< Dividend Amount >|< Paid By Director >|< Status >|< Paid On Date >") ,
+  /**ShareHolder ID = int<value shareholder id>, Dividend Date  = date<Dividend Date>, Dividend Amount = float<Dividend Amount>, Paid By Director = on || off <if shareholder == director>, Status = 1 => (create) > /
+ */
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividend/
+
+
+
+// Request for Dividend Share Holder List
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendShareHolderList/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendShareHolderList/API-KEY/$1'
+
+
+
+// Request for Dividend Directors List
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendDirectorsList/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendDirectorsList/API-KEY/$1'
+
+
+
+// Request for Dividend Total Share
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendTotalShare/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendTotalShare/API-KEY/$1'
+
+
+
+// Request for Dividend User Share
+// request-type => get , parameter => API-KEY, userId
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendUserShare/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/dividendUserShare/userId/$1/API-KEY/$2'
+
+
+
+// Request contact details Questions or Reasons
+// request-type => get , parameter => API-KEY
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/contactCategories/
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/contact/API-KEY/$1'
+
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/contactCategories/kcc0w4k04844c00ok44gcwc8s4ks0w8w0ko84gsg
+
+Done
+
+// Request to submit contact us form and send email
+// request-type => post , parameter => API-KEY, Reason, Description
+http://www.cashmann.co.uk/flexi/uat/api/Clientapi/contact/
+
+
+// Request Payroll listing
+// request-type => get , parameter => page,API-KEY
+
+http://cashmann.co.uk/flexi/uat/api/Clientapi/payroll/page/0/eid/491/fyear/2016-2017/API-KEY/ok0o00kwc04w0cgsk0gs8g40o4084go0wcwoc84k
+
+
+// Request invoice delete
+// request-type => delete , parameter => invoiceId,API-KEY
+// ** 'http://www.cashmann.co.uk/flexi/uat/api/Clientapi/invoice/invoiceId/$1/API-KEY/$2'
+
+
+http://cashmann.co.uk/flexi/api/Clientapi/invoice/invoiceId/257/API-KEY/k8skc8koo4ckokg0o0sk8sc0wkw4o0gks48s4o0o
+
+// Request Expense delete
+// request-type => delete , parameter => expenseId,API-KEY
+http://cashmann.co.uk/flexi/uat/api/Clientapi/expense/expenseId/20/API-KEY/ko0wc8cwg88kw84w0gogg8ok4kks8ccck0kk484g

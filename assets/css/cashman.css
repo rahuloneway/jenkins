@@ -1,0 +1,502 @@
+.spacer{
+	margin-right: 10px;
+}
+
+textarea{
+	resize: none !important;
+}
+
+#addCustomerDetail{
+	display: none;
+}
+
+.sm-width{
+	width: 60px;
+}
+
+.modal-invoice,
+.modal-dashboard,
+.edit-invoice,
+.modal-expenses,
+.modal-dividend,
+.modal-payee,
+.modal-statements-edit,
+.modal-journal{
+	z-index: 2 ;
+}
+.modal-statements{
+	z-index: 3 ;
+}
+
+.ui-widget-overlay {
+	background: #aaa url("images/ui-bg_diagonals-thick_20_666666_40x40.png") 50% 50% !important;
+	opacity: .6 !important;
+}
+
+.progress{
+	padding: 0px !important;
+	margin-top: -13px;
+	height: 45px;
+}
+
+.no-padding{
+	padding: 0px !important;
+}
+
+.no-gutter{
+	margin-left: 0px !important;
+}
+.popover-content{
+	display:none;
+}
+
+.my-account{
+	padding: 10px 0 10px 0px;
+}
+
+.modal-backdrop {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1;
+	background: #aaa url("images/ui-bg_diagonals-thick_20_666666_40x40.png") 50% 50% !important;
+	opacity:0.7;
+}
+
+.small_sel select{
+	width: 102px !important;
+}
+
+.umsg,.pmsg{
+	display:none;
+	margin-top: -20px;
+}
+
+.clientErrors,.clearMsg,.mileageFilters{
+	display: none;
+}
+
+a.changeStatus
+{
+	color: #fff !important;
+}
+
+.ui-tooltip{
+	font-size: 11px !important;
+	padding: 4px !important;
+}
+
+.fa,.glyphicon{
+	padding-right: 4px !important;
+}
+/* .removeInvoiceItem .fa{
+	padding-right: 1px !important;
+} */
+.color{
+	color: #fff !important;
+}
+
+.rNewPassword,.rConfirmPassword,.answer{
+	margin-top: 10px;
+	margin-bottom: -10px;
+	display: none;
+}
+
+.rQuestion{
+	margin-top: 10px;
+	margin-bottom: -10px;
+	display: none;
+}
+
+#resetPassword{
+	padding: auto !important;
+}
+#resetPassword input[type="text"],#resetPassword input[type="password"],#resetPassword select{
+	margin: 0px !important;
+	height: 40px !important;
+}
+
+.mileage-box,.isRegisteredVAT{
+	display:none;
+}
+
+.showSummary{
+	margin-left: 10px !important;
+}
+
+.pointer{
+	cursor: default !important;
+}
+
+.ui-datepicker-month,.ui-datepicker-year {
+	color:#6e6a6a !important;
+}
+
+.company_name{
+	margin-bottom: auto !important;
+	color: #fff;
+}
+.error-field{
+	margin-top: 4px !important;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+#add-invoice-item{
+	width: 125px !important;
+}
+
+.addBtn{
+	margin-top: auto !important;
+}
+
+#payViaDirector{
+	display: none;
+}
+
+.showShareHolderFields,.paidDate{
+	display: none;
+}
+.currency-sign{
+	margin-top: 3px !important;
+	font-size: 16px !important;
+}
+
+.expenses_middle{
+		height: auto !important;
+}
+
+#example-advanced{
+	/*line-height: 2.5;*/
+}
+
+table#example-advanced tbody{
+	background-color: #fff !important;
+}
+
+.del-button{
+	color: red;
+	padding-right: 0px !important;
+}
+
+.navbar ul li{
+	margin-right: 4px !important;
+}
+
+#documentsCategory{
+	width: 100%;
+}
+
+#example-advanced td a{
+	color: #000;
+}
+
+
+#example-advanced td:hover a{
+	/*color: #fff !important;*/
+	text-decoration: none !important;
+}
+
+select#quarters {
+	width: 250px;
+}
+
+#documentsCategory select{
+	width: auto !important;
+}
+
+/* .ExpenseMileage{
+	width: 120px !important;
+} */
+
+.TotalExpenseAmount{
+	margin-right: 5px;
+}
+
+tr.less-amount td{
+	background-color: #FF8080 !important;
+	color: #fff !important;
+	font-weight: bolder;
+}
+
+tr.salary-table th,tr.table-header th{
+	background-color: #01347b !important;
+	color: #fff !important;
+	border-radius: 0;
+	border-right: 0px !important;
+}
+tr.salary-table th a,tr.table-header th a{
+		color: #fff !important;
+	}
+
+tr.salary-table td{
+	/*background-color: #2685e1;
+	background-color: #6e6a6a;
+	color: #fff;*/
+	background-color: rgb(183, 183, 183);
+	color: #fff;
+	border-radius: initial;
+	border-right: 0px !important;
+	font-weight: bold;
+}
+.sm-width-box{
+	width: 120px !important;
+}
+
+.lm-width-box{
+	width: 320px !important;
+}
+
+.xs-width-box{
+	width: 100px !important;
+}
+
+.category{
+	width: 200px !important;
+}
+
+/** Invoices VAt Quarter details pop up **/
+
+.tbody_bg th
+{
+  background:#00347f !important;
+  color:#fff !important;
+}
+.tbody_bg th:first-child
+{
+    border-radius: 6px 0 0 0;
+ }
+ .tbody_bg th:last-child
+ {
+	 border-radius:0 6px  0 0;
+ }
+.total_show
+{
+  background-color:rgb(225, 224, 224);
+  
+}
+.total_show > td {
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+.tab-content.add-accountant > fieldset {
+  border: 1px solid rgb(192, 192, 192) !important;
+  padding-left: 20px;
+}
+/** Invoices VAt Quarter details pop up **/
+
+.showImage{
+	display: none;
+}
+
+.save-detail-div{
+	margin: 0 auto;
+}
+
+td.text-color{
+	color: #fff !important;
+}
+td.bg-color-red{
+	background-color: #FF0000;
+	color:#fff !important;
+}
+
+td.bg-color-green{
+	background-color: #008000;
+	color:#fff !important;
+}
+
+td.bg-color-amber{
+	background-color: #FFC200;
+}
+
+.btn-inverse {
+	background-color: hsl(0, 0%, 24%) !important;
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#7a7a7a", endColorstr="#3d3d3d");
+	background-image: linear-gradient(#01347b, #09326a);
+	background-image: -moz-linear-gradient(top, #7a7a7a, #3d3d3d);
+	background-image: -ms-linear-gradient(top, #7a7a7a, #3d3d3d);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7a7a7a), color-stop(100%, #3d3d3d));
+	background-image: -webkit-linear-gradient(top, #7a7a7a, #3d3d3d);
+	background-image: -o-linear-gradient(top, #7a7a7a, #3d3d3d);
+	background-image: linear-gradient(#7a7a7a, #3d3d3d);
+	border-color: #3d3d3d #3d3d3d hsl(0, 0%, 18%);
+	color: #fff !important;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.39);
+	-webkit-font-smoothing: antialiased;
+	 font-size: 14.5px;
+    padding: 2px 4px;
+}
+
+.btn-inverse:hover {
+	background-color: hsl(207, 79%, 43%) !important;
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00347f", endColorstr="#1776c4");
+	background-image: -khtml-gradient(linear, left top, left bottom, from(#01347b), to(#09326a));
+	background-image: -moz-linear-gradient(top, #00347f, #1776c4);
+	background-image: -ms-linear-gradient(top, #00347f, #1776c4);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #56a8eb), color-stop(100%, #1776c4));
+	background-image: -webkit-linear-gradient(top, #00347f, #1776c4);
+	background-image: -o-linear-gradient(top, #00347f, #1776c4);
+	background-image: linear-gradient(#00347f, #1776c4);
+	border-color: #1776c4 #1776c4 hsl(207, 79%, 38%);
+	color: #fff !important;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.39);
+	-webkit-font-smoothing: antialiased;
+}
+
+div.table-responsive.stotal_TB{
+	border:0px;
+}
+.total_standard{
+	background-color:#d1d1d1;
+}tr.total_standard td{
+	color:#000;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+#myCarousel{
+	font-size: 12px !important;
+	text-align: center !important;
+	font-weight: bolder;
+	min-height: 462px;
+}
+
+#DashboardShareHoldersDetail{
+	width: 140px !important;
+}
+
+
+#sInvoiceStatus{
+	width: 135px !important;
+}
+
+.text-bold-color{
+	color: #585656;
+}
+
+
+
+/************************** table-ledger ( Ledger accounts page ) css start here ****/
+table.table-ledger {
+	border:1px solid #d3d3d3;
+	margin-top:20px;
+}
+table.table-ledger tr.border-bottom td {
+	border-bottom:1px solid #d3d3d3;
+}
+
+table.table-ledger tr.light_red {
+	background:#fceaea;
+}
+table.table-ledger {
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	border-radius:5px;
+	border-collapse:separate;
+}
+table.table-ledger tr td:nth-child(6),table.table-ledger tr th:nth-child(6) {
+	text-align:right;
+	padding-right:10px;
+}
+table.table-ledger tr td:last-child,table.table-ledger tr th:last-child {
+	text-align:center;
+}
+.inner_table tr td:nth-child(7),table.table-ledger tr td:nth-child(7)
+{
+	text-align:right;
+	padding-right:0;
+}
+
+.blue_text th ,.blue-accordian {
+	font-weight: bold;
+}
+.table-ledger tr th
+{
+	padding-left:7px;
+}
+
+.blue-accordian {
+	padding:9px 9px 36px 0;
+}
+.panel-heading.blue-accordian a {
+	color:#fff;
+	font-size:15px;
+	font-weight:bold;
+}
+.inner_table {
+	border:0px solid #d3d3d3;
+}
+.inner_table tr td:not(:nth-child(8)) {
+	border: 0;
+	text-align: left;
+	padding:2px 16px 2px 9px;
+
+}
+.inner_table tr td:nth-child(8)
+{
+	border:0;
+}
+table.table-ledger  .inner_table tr.thick_border td
+{
+  border-bottom:2px solid #d3d3d3;
+}
+.inner_table tr th {
+	border-left:0 none;
+	border-right:0 none;
+}
+.inner_table tr th{
+	text-align:center;
+}
+.table-ledger .collapse.in {
+	display: table;
+}
+.blue-accordian:hover{
+	cursor:pointer;
+}
+.blue-accordian.collapsed td .glyphicon-minus, .blue-accordian td .glyphicon-plus{
+	display:none;
+}
+.blue-accordian.collapsed td .glyphicon-plus{
+	display:block;
+}
+.space_left
+{
+  padding-left:10px;
+}
+/*td.padding-small
+{
+  padding:2px 4px;
+}*/
+
+/************************** table-ledger ( Ledger accounts page ) css end here ****/
+#ui-datepicker-div{
+	  
+}
+/*  input[type="text"]::-webkit-input-placeholder::after {
+  background-color:white;
+  content:'x';
+  color:black;
+  background-color:tomato;
+  border:none;
+  font-weight:bold;
+  position:relative;
+  left:0;
+  transition:left 1s;
+}  */
+
+.icon-color{
+	padding-top: 8px;
+	font-size: 18px;
+	padding-right: 10px !important;
+	color: red;
+}
+
+.error-border{
+	border: 1px solid red;
+}

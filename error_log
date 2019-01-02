@@ -1,0 +1,2 @@
+[12-Jul-2016 13:12:31 UTC] PHP Fatal error:  Call to undefined method Account::getClientDetail() in /home/onewayit/public_html/flexi/application/controllers/accountant/Accountant.php on line 67
+[12-Jul-2016 13:13:17 UTC] PHP Fatal error:  Call to undefined method Account::getClientDetail() in /home/onewayit/public_html/flexi/application/controllers/accountant/Accountant.php on line 67

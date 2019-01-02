@@ -1,0 +1,64 @@
+<?php 
+	//echo '<pre>';print_r($items);echo '</pre>';die;
+	if(count($items) <= 0)
+	{
+		echo '<tr>';
+			echo '<td colspan="14">';
+				echo '<div class="alert alert-info text-center">';
+					echo $this->lang->line('ACCOUNTANT_NO_CLIENT_RECORD');
+				echo '</div>';
+			echo '</td>';
+		echo '</tr>';
+	}else{
+		$sn = ($this->uri->segment(2)) ? $this->uri->segment(2) : 0;
+		foreach($items as $key=>$val)
+		{
+			echo '<tr>';
+				echo '<td>'.($sn+1).'</td>';
+				$id = $this->encrypt->encode($val->ID);
+				echo '<td>';
+					echo '<a href="'.site_url().'client_access/'.$id.'">'.$val->Name.'</a>';
+				echo '</td>';
+				echo '<td>'.$val->ContactNo.'</td>';
+				echo '<td>'.$val->Email.'</td>';
+				echo '<td>'.$val->CompanyName.'</td>';
+				echo '<td>';
+					$rel_acc = accountant_list();
+					
+					$relation_with = $val->Relation_with;
+					if($val->Relation_with != 0)
+					{
+						if(array_key_exists($relation_with,$rel_acc))
+						{
+							echo $rel_acc[$relation_with];
+						}
+					}
+				echo '</td>';
+				echo '<td>'.cDate($val->EndDate).'</td>';
+				echo '<td>';
+					if($val->Status == 1)
+					{
+						echo '<span class="btn btn-success btn-xs pointer">ENABLED</span>';
+					}else{
+						echo '<span class="btn btn-danger btn-xs pointer">DISABLED</span>';
+					}
+				echo '</td>';
+				echo '<td>';
+					if($val->State == 1)
+					{
+						echo '<a href ="'.site_url().'resend_email/'.$id.'"class="btn btn-danger btn-xs color resendEmail">Resend Email</a>';
+					}else{
+						echo '<a href ="'.site_url().'resend_email/'.$id.'"class="btn btn-success btn-xs color resendEmail">Send Email</a>';
+					}
+				echo '</td>';
+				echo '<td>';
+					$tooltip = 'data-toggle="tooltip" data-placement="right" title="'.$this->lang->line('TOOLTIP_EDIT_CLIENT').'"';
+					echo '<a href="'.site_url().'update_client/'.$id.'" class="btn btn-primary btn-xs color editClient" '.$tooltip.'>';
+						echo '<i class="glyphicon glyphicon-pencil"></i>';
+					echo '<a/>';
+				echo '</td>';
+			echo '</tr>';
+			$sn++;
+		}
+	}
+?>
